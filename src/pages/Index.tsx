@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Compass, Search, BookOpen } from 'lucide-react';
+import { Compass, Search, BookOpen, Home } from 'lucide-react';
 import IntroScreen from '@/components/IntroScreen';
+import Homepage from '@/components/Homepage';
 import ExploreTab from '@/components/ExploreTab';
 import SearchTab from '@/components/SearchTab';
 import CollectionTab from '@/components/CollectionTab';
@@ -21,11 +22,17 @@ const Index = () => {
   const [showIntro, setShowIntro] = useState(() => {
     return !localStorage.getItem(INTRO_KEY);
   });
+  const [showHomepage, setShowHomepage] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>('explore');
 
   const handleIntroComplete = useCallback(() => {
     setShowIntro(false);
     localStorage.setItem(INTRO_KEY, 'true');
+  }, []);
+
+  const handleHomepageNavigate = useCallback((tab: 'explore' | 'pokedes') => {
+    setActiveTab(tab as TabId);
+    setShowHomepage(false);
   }, []);
 
   return (
@@ -34,7 +41,11 @@ const Index = () => {
         {showIntro && <IntroScreen onComplete={handleIntroComplete} />}
       </AnimatePresence>
 
-      {!showIntro && (
+      {!showIntro && showHomepage && (
+        <Homepage onNavigate={handleHomepageNavigate} />
+      )}
+
+      {!showIntro && !showHomepage && (
         <>
           <Particles />
 
@@ -43,9 +54,9 @@ const Index = () => {
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.2 }}
               >
                 {activeTab === 'explore' && <ExploreTab />}
@@ -58,6 +69,16 @@ const Index = () => {
           {/* Tab bar */}
           <nav className="fixed bottom-0 left-0 right-0 z-30 glass-strong">
             <div className="flex items-center justify-around max-w-lg mx-auto py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+              {/* Home button */}
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setShowHomepage(true)}
+                className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+              >
+                <Home className="w-5 h-5" />
+                <span className="font-pixel text-[7px]">Home</span>
+              </motion.button>
+
               {tabs.map(tab => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -71,14 +92,14 @@ const Index = () => {
                     }`}
                   >
                     <Icon className="w-5 h-5" />
-                    <span className={`font-pixel text-[7px] ${isActive ? 'text-glow-red' : ''}`}>
+                    <span className={`font-pixel text-[7px] ${isActive ? '' : ''}`}>
                       {tab.label}
                     </span>
                     {isActive && (
                       <motion.div
                         layoutId="tab-indicator"
                         className="absolute -bottom-0 w-8 h-0.5 rounded-full bg-poke-red"
-                        style={{ boxShadow: '0 0 8px hsl(1 100% 60% / 0.6)' }}
+                        style={{ boxShadow: '0 0 6px hsl(1 100% 60% / 0.4)' }}
                       />
                     )}
                   </motion.button>
