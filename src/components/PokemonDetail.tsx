@@ -25,6 +25,7 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite }: Pokem
   const [species, setSpecies] = useState<PokemonSpecies | null>(null);
   const [showShiny, setShowShiny] = useState(false);
   const [evolutionNames, setEvolutionNames] = useState<string[]>([]);
+  const [activeSection, setActiveSection] = useState<'stats' | 'lore'>('stats');
   const mainType = pokemon.types[0]?.type.name || 'normal';
   const typeColor = TYPE_COLORS[mainType] || TYPE_COLORS.normal;
 
@@ -158,76 +159,164 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite }: Pokem
               </div>
             </div>
 
-            {description && (
+            {/* Section toggle */}
+            <div className="flex gap-2 mb-6">
+              {(['stats', 'lore'] as const).map(section => (
+                <button
+                  key={section}
+                  onClick={() => setActiveSection(section)}
+                  className={`px-4 py-2 rounded-lg font-pixel text-[8px] tracking-wider transition-all ${
+                    activeSection === section
+                      ? 'neon-border-red text-foreground'
+                      : 'glass text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {section === 'stats' ? 'STATS' : 'HISTORY & ORIGIN'}
+                </button>
+              ))}
+            </div>
+
+            {description && activeSection === 'stats' && (
               <p className="text-sm text-muted-foreground text-center mb-8 leading-relaxed max-w-md mx-auto">
                 {description}
               </p>
             )}
 
-            {/* Physical */}
-            <div className="grid grid-cols-2 gap-3 mb-8">
-              <div className="glass rounded-xl p-3 text-center">
-                <p className="text-[8px] font-pixel text-muted-foreground mb-1">HEIGHT</p>
-                <p className="text-foreground text-sm font-medium">{(pokemon.height / 10).toFixed(1)} m</p>
-              </div>
-              <div className="glass rounded-xl p-3 text-center">
-                <p className="text-[8px] font-pixel text-muted-foreground mb-1">WEIGHT</p>
-                <p className="text-foreground text-sm font-medium">{(pokemon.weight / 10).toFixed(1)} kg</p>
-              </div>
-            </div>
+            {/* Stats section */}
+            {activeSection === 'stats' && (
+              <>
+                {/* Physical */}
+                <div className="grid grid-cols-2 gap-3 mb-8">
+                  <div className="glass rounded-xl p-3 text-center">
+                    <p className="text-[8px] font-pixel text-muted-foreground mb-1">HEIGHT</p>
+                    <p className="text-foreground text-sm font-medium">{(pokemon.height / 10).toFixed(1)} m</p>
+                  </div>
+                  <div className="glass rounded-xl p-3 text-center">
+                    <p className="text-[8px] font-pixel text-muted-foreground mb-1">WEIGHT</p>
+                    <p className="text-foreground text-sm font-medium">{(pokemon.weight / 10).toFixed(1)} kg</p>
+                  </div>
+                </div>
 
-            {/* Abilities */}
-            <div className="mb-8">
-              <h3 className="font-pixel text-[8px] text-muted-foreground mb-3 tracking-wider">ABILITIES</h3>
-              <div className="flex flex-wrap gap-2">
-                {pokemon.abilities.map(a => (
-                  <span key={a.ability.name} className="px-3 py-1.5 rounded-lg glass text-xs text-foreground">
-                    {capitalize(a.ability.name.replace('-', ' '))}
-                    {a.is_hidden && <span className="text-muted-foreground ml-1 text-[10px]">(Hidden)</span>}
-                  </span>
-                ))}
-              </div>
-            </div>
+                {/* Abilities */}
+                <div className="mb-8">
+                  <h3 className="font-pixel text-[8px] text-muted-foreground mb-3 tracking-wider">ABILITIES</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {pokemon.abilities.map(a => (
+                      <span key={a.ability.name} className="px-3 py-1.5 rounded-lg glass text-xs text-foreground">
+                        {capitalize(a.ability.name.replace('-', ' '))}
+                        {a.is_hidden && <span className="text-muted-foreground ml-1 text-[10px]">(Hidden)</span>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
 
-            {/* Stats */}
-            <div className="mb-8">
-              <h3 className="font-pixel text-[8px] text-muted-foreground mb-4 tracking-wider">BASE STATS</h3>
-              <div className="space-y-3">
-                {pokemon.stats.map((stat, i) => (
-                  <div key={stat.stat.name} className="flex items-center gap-3">
-                    <span className="font-pixel text-[7px] text-muted-foreground w-12 text-right">
-                      {STAT_NAMES[stat.stat.name] || stat.stat.name}
-                    </span>
-                    <span className="text-xs text-foreground w-8 text-right font-medium tabular-nums">{stat.base_stat}</span>
-                    <div className="flex-1 h-1.5 rounded-full bg-muted/50 overflow-hidden">
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{ background: `hsl(${typeColor})` }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${Math.min((stat.base_stat / 255) * 100, 100)}%` }}
-                        transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: 'easeOut' }}
-                      />
+                {/* Stats */}
+                <div className="mb-8">
+                  <h3 className="font-pixel text-[8px] text-muted-foreground mb-4 tracking-wider">BASE STATS</h3>
+                  <div className="space-y-3">
+                    {pokemon.stats.map((stat, i) => (
+                      <div key={stat.stat.name} className="flex items-center gap-3">
+                        <span className="font-pixel text-[7px] text-muted-foreground w-12 text-right">
+                          {STAT_NAMES[stat.stat.name] || stat.stat.name}
+                        </span>
+                        <span className="text-xs text-foreground w-8 text-right font-medium tabular-nums">{stat.base_stat}</span>
+                        <div className="flex-1 h-1.5 rounded-full bg-muted/50 overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full"
+                            style={{ background: `hsl(${typeColor})` }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min((stat.base_stat / 255) * 100, 100)}%` }}
+                            transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: 'easeOut' }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Evolution */}
+                {evolutionNames.length > 1 && (
+                  <div className="mb-8">
+                    <h3 className="font-pixel text-[8px] text-muted-foreground mb-4 tracking-wider">EVOLUTION</h3>
+                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                      {evolutionNames.map((name, i) => (
+                        <div key={name} className="flex items-center gap-2">
+                          <span className={`px-3 py-1.5 rounded-lg glass text-xs ${name === pokemon.name ? 'neon-border-red text-foreground' : 'text-muted-foreground'}`}>
+                            {capitalize(name)}
+                          </span>
+                          {i < evolutionNames.length - 1 && (
+                            <span className="text-muted-foreground/40 text-xs">→</span>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                )}
+              </>
+            )}
 
-            {/* Evolution */}
-            {evolutionNames.length > 1 && (
-              <div className="mb-8">
-                <h3 className="font-pixel text-[8px] text-muted-foreground mb-4 tracking-wider">EVOLUTION</h3>
-                <div className="flex items-center justify-center gap-2 flex-wrap">
-                  {evolutionNames.map((name, i) => (
-                    <div key={name} className="flex items-center gap-2">
-                      <span className={`px-3 py-1.5 rounded-lg glass text-xs ${name === pokemon.name ? 'neon-border-red text-foreground' : 'text-muted-foreground'}`}>
-                        {capitalize(name)}
-                      </span>
-                      {i < evolutionNames.length - 1 && (
-                        <span className="text-muted-foreground/40 text-xs">→</span>
-                      )}
+            {/* History & Origin section */}
+            {activeSection === 'lore' && (
+              <div className="space-y-6">
+                {/* Generation & Region */}
+                <div className="glass rounded-xl p-4">
+                  <h3 className="font-pixel text-[8px] text-muted-foreground mb-3 tracking-wider">ORIGIN</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Generation</span>
+                      <span className="text-foreground">{species?.generation?.name ? capitalize(species.generation.name.replace('-', ' ').replace('generation ', 'Gen ')) : '—'}</span>
                     </div>
-                  ))}
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Category</span>
+                      <span className="text-foreground">{genus || '—'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Classification</span>
+                      <span className="text-foreground">
+                        {isLegendary ? 'Legendary' : isMythical ? 'Mythical' : 'Standard'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pokédex Entries */}
+                {species && (
+                  <div className="glass rounded-xl p-4">
+                    <h3 className="font-pixel text-[8px] text-muted-foreground mb-3 tracking-wider">POKÉDEX ENTRIES</h3>
+                    <div className="space-y-3 max-h-48 overflow-y-auto pr-2" style={{ maskImage: 'linear-gradient(to bottom, black 85%, transparent)' }}>
+                      {species.flavor_text_entries
+                        .filter(e => e.language.name === 'en')
+                        .slice(0, 5)
+                        .map((entry, i) => (
+                          <p key={i} className="text-xs text-muted-foreground leading-relaxed">
+                            {entry.flavor_text.replace(/\f/g, ' ').replace(/\n/g, ' ')}
+                          </p>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Design Notes */}
+                <div className="glass rounded-xl p-4">
+                  <h3 className="font-pixel text-[8px] text-muted-foreground mb-3 tracking-wider">PROFILE</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Height</span>
+                      <span className="text-foreground">{(pokemon.height / 10).toFixed(1)} m</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Weight</span>
+                      <span className="text-foreground">{(pokemon.weight / 10).toFixed(1)} kg</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Types</span>
+                      <span className="text-foreground">{pokemon.types.map(t => capitalize(t.type.name)).join(', ')}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Abilities</span>
+                      <span className="text-foreground text-right">{pokemon.abilities.map(a => capitalize(a.ability.name.replace('-', ' '))).join(', ')}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -235,7 +324,7 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite }: Pokem
             {/* Legendary/Mythical badge */}
             {species && (isLegendary || isMythical) && (
               <motion.div
-                className="text-center"
+                className="text-center mt-6"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.4 }}
