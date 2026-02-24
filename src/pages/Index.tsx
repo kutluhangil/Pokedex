@@ -1,11 +1,12 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Compass, Search, BookOpen, Home } from 'lucide-react';
+import { Compass, Search, BookOpen, Home, Globe } from 'lucide-react';
 import IntroScreen from '@/components/IntroScreen';
 import Homepage from '@/components/Homepage';
 import ExploreTab from '@/components/ExploreTab';
 import SearchTab from '@/components/SearchTab';
 import CollectionTab from '@/components/CollectionTab';
+import WorldTab from '@/components/WorldTab';
 import Particles from '@/components/Particles';
 
 const INTRO_KEY = 'pokedex-intro-seen';
@@ -13,6 +14,7 @@ const INTRO_KEY = 'pokedex-intro-seen';
 const tabs = [
   { id: 'explore', label: 'Explore', icon: Compass },
   { id: 'pokedes', label: 'Pokédes', icon: Search },
+  { id: 'world', label: 'World', icon: Globe },
   { id: 'collection', label: 'Collection', icon: BookOpen },
 ] as const;
 
@@ -30,7 +32,7 @@ const Index = () => {
     localStorage.setItem(INTRO_KEY, 'true');
   }, []);
 
-  const handleHomepageNavigate = useCallback((tab: 'explore' | 'pokedes') => {
+  const handleHomepageNavigate = useCallback((tab: 'explore' | 'pokedes' | 'world') => {
     setActiveTab(tab as TabId);
     setShowHomepage(false);
   }, []);
@@ -61,6 +63,7 @@ const Index = () => {
               >
                 {activeTab === 'explore' && <ExploreTab />}
                 {activeTab === 'pokedes' && <SearchTab />}
+                {activeTab === 'world' && <WorldTab />}
                 {activeTab === 'collection' && <CollectionTab />}
               </motion.div>
             </AnimatePresence>
@@ -73,10 +76,10 @@ const Index = () => {
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowHomepage(true)}
-                className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors text-muted-foreground hover:text-foreground"
               >
                 <Home className="w-5 h-5" />
-                <span className="font-pixel text-[7px]">Home</span>
+                <span className="font-pixel text-[6px]">Home</span>
               </motion.button>
 
               {tabs.map(tab => {
@@ -87,19 +90,19 @@ const Index = () => {
                     key={tab.id}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-colors ${
+                    className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors ${
                       isActive ? 'text-poke-red' : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     <Icon className="w-5 h-5" />
-                    <span className={`font-pixel text-[7px] ${isActive ? '' : ''}`}>
+                    <span className="font-pixel text-[6px]">
                       {tab.label}
                     </span>
                     {isActive && (
                       <motion.div
                         layoutId="tab-indicator"
                         className="absolute -bottom-0 w-8 h-0.5 rounded-full bg-poke-red"
-                        style={{ boxShadow: '0 0 6px hsl(1 100% 60% / 0.4)' }}
+                        style={{ boxShadow: '0 0 6px hsl(var(--poke-red) / 0.3)' }}
                       />
                     )}
                   </motion.button>
