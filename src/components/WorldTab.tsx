@@ -178,39 +178,169 @@ const InteractiveGlobe = ({
 
   // Continent shapes (simplified pixel blocks)
   const continents = useMemo(() => {
-    const landmasses = [
-      // Asia/Japan-inspired
-      { lats: [25, 30, 35, 40, 45, 50], lngs: [120, 125, 130, 135, 140, 145] },
-      // Europe
-      { lats: [40, 45, 50, 55], lngs: [-10, -5, 0, 5, 10, 15, 20] },
-      // Americas
-      { lats: [25, 30, 35, 40, 45], lngs: [-80, -75, -70, -65] },
-      // Tropics
-      { lats: [10, 15, 20], lngs: [-160, -155, -150] },
-      // Southern
-      { lats: [-10, -5, 0, 5, 10], lngs: [100, 105, 110, 115] },
+    // Realistic Earth continents as lat/lng pixel blocks (5° grid, 8-bit style)
+    const land: [number, number, string][] = [
+      // ── North America ──
+      // Alaska
+      ...[60,65,70].flatMap(lat => ([-170,-165,-160,-155,-150,-145] as number[]).map(lng => [lat, lng, '142 50% 35%'] as [number,number,string])),
+      // Canada
+      ...[55,60,65].flatMap(lat => ([-140,-135,-130,-125,-120,-115,-110,-105,-100,-95,-90,-85,-80,-75,-70,-65] as number[]).map(lng => [lat, lng, '142 45% 32%'] as [number,number,string])),
+      ...[50].flatMap(lat => ([-130,-125,-120,-115,-110,-105,-100,-95,-90,-85,-80,-75,-70,-65] as number[]).map(lng => [lat, lng, '142 40% 34%'] as [number,number,string])),
+      // USA
+      ...[45].flatMap(lat => ([-125,-120,-115,-110,-105,-100,-95,-90,-85,-80,-75,-70] as number[]).map(lng => [lat, lng, '100 40% 38%'] as [number,number,string])),
+      ...[40].flatMap(lat => ([-125,-120,-115,-110,-105,-100,-95,-90,-85,-80,-75] as number[]).map(lng => [lat, lng, '90 35% 40%'] as [number,number,string])),
+      ...[35].flatMap(lat => ([-120,-115,-110,-105,-100,-95,-90,-85,-80] as number[]).map(lng => [lat, lng, '80 40% 42%'] as [number,number,string])),
+      ...[30].flatMap(lat => ([-105,-100,-95,-90,-85,-80] as number[]).map(lng => [lat, lng, '60 45% 40%'] as [number,number,string])),
+      // Florida
+      [25, -80, '50 50% 42%'], [25, -85, '50 50% 42%'],
+      // Mexico & Central America
+      ...[25,20].flatMap(lat => ([-115,-110,-105,-100,-95] as number[]).map(lng => [lat, lng, '45 40% 38%'] as [number,number,string])),
+      ...[15].flatMap(lat => ([-100,-95,-90,-85] as number[]).map(lng => [lat, lng, '80 45% 40%'] as [number,number,string])),
+      [10, -85, '100 50% 42%'], [10, -80, '100 50% 42%'], [10, -75, '100 50% 42%'],
+
+      // ── South America ──
+      ...[5,0].flatMap(lat => ([-80,-75,-70,-65,-60,-55,-50] as number[]).map(lng => [lat, lng, '130 55% 38%'] as [number,number,string])),
+      ...[-5].flatMap(lat => ([-80,-75,-70,-65,-60,-55,-50,-45,-40,-35] as number[]).map(lng => [lat, lng, '120 50% 35%'] as [number,number,string])),
+      ...[-10].flatMap(lat => ([-78,-75,-70,-65,-60,-55,-50,-45,-40,-35] as number[]).map(lng => [lat, lng, '130 55% 38%'] as [number,number,string])),
+      ...[-15].flatMap(lat => ([-75,-70,-65,-60,-55,-50,-45,-40] as number[]).map(lng => [lat, lng, '110 45% 36%'] as [number,number,string])),
+      ...[-20].flatMap(lat => ([-70,-65,-60,-55,-50,-45,-40] as number[]).map(lng => [lat, lng, '90 40% 38%'] as [number,number,string])),
+      ...[-25].flatMap(lat => ([-70,-65,-60,-55,-50,-45] as number[]).map(lng => [lat, lng, '80 40% 36%'] as [number,number,string])),
+      ...[-30].flatMap(lat => ([-70,-65,-60,-55,-50] as number[]).map(lng => [lat, lng, '100 40% 34%'] as [number,number,string])),
+      ...[-35,-40].flatMap(lat => ([-72,-70,-65,-60] as number[]).map(lng => [lat, lng, '80 35% 36%'] as [number,number,string])),
+      [-45, -70, '100 30% 34%'], [-45, -65, '100 30% 34%'],
+      [-50, -70, '120 25% 32%'], [-55, -68, '120 25% 30%'],
+
+      // ── Europe ──
+      ...[70,65].flatMap(lat => ([10,15,20,25,30] as number[]).map(lng => [lat, lng, '200 20% 40%'] as [number,number,string])),
+      ...[60].flatMap(lat => ([5,10,15,20,25,30,35,40] as number[]).map(lng => [lat, lng, '180 25% 38%'] as [number,number,string])),
+      ...[55].flatMap(lat => ([-10,-5,0,5,10,15,20,25,30,35,40] as number[]).map(lng => [lat, lng, '160 30% 40%'] as [number,number,string])),
+      ...[50].flatMap(lat => ([-10,-5,0,5,10,15,20,25,30,35,40,45] as number[]).map(lng => [lat, lng, '140 30% 42%'] as [number,number,string])),
+      ...[45].flatMap(lat => ([-10,-5,0,5,10,15,20,25,30,35,40] as number[]).map(lng => [lat, lng, '100 35% 44%'] as [number,number,string])),
+      ...[40].flatMap(lat => ([-10,-5,0,5,10,15,20,25,30] as number[]).map(lng => [lat, lng, '50 40% 45%'] as [number,number,string])),
+      // UK / Ireland
+      [55, -5, '160 35% 38%'], [50, -5, '140 35% 40%'],
+      // Scandinavia
+      ...[65,60].flatMap(lat => ([10,15,20] as number[]).map(lng => [lat, lng, '200 25% 36%'] as [number,number,string])),
+      // Iceland
+      [65, -20, '200 20% 35%'],
+
+      // ── Africa ──
+      ...[35,30].flatMap(lat => ([-5,0,5,10] as number[]).map(lng => [lat, lng, '40 55% 50%'] as [number,number,string])),
+      ...[25,20].flatMap(lat => ([-15,-10,-5,0,5,10,15,20,25,30,35] as number[]).map(lng => [lat, lng, '45 60% 55%'] as [number,number,string])),
+      ...[15].flatMap(lat => ([-15,-10,-5,0,5,10,15,20,25,30,35,40] as number[]).map(lng => [lat, lng, '35 55% 48%'] as [number,number,string])),
+      ...[10].flatMap(lat => ([-15,-10,-5,0,5,10,15,20,25,30,35,40,45] as number[]).map(lng => [lat, lng, '100 50% 40%'] as [number,number,string])),
+      ...[5].flatMap(lat => ([-10,-5,0,5,10,15,20,25,30,35,40,45] as number[]).map(lng => [lat, lng, '120 55% 38%'] as [number,number,string])),
+      ...[0].flatMap(lat => ([10,15,20,25,30,35,40] as number[]).map(lng => [lat, lng, '130 55% 36%'] as [number,number,string])),
+      ...[-5].flatMap(lat => ([15,20,25,30,35,40] as number[]).map(lng => [lat, lng, '120 50% 38%'] as [number,number,string])),
+      ...[-10].flatMap(lat => ([20,25,30,35,40] as number[]).map(lng => [lat, lng, '90 45% 40%'] as [number,number,string])),
+      ...[-15].flatMap(lat => ([20,25,30,35,40] as number[]).map(lng => [lat, lng, '80 40% 38%'] as [number,number,string])),
+      ...[-20].flatMap(lat => ([25,30,35] as number[]).map(lng => [lat, lng, '60 45% 42%'] as [number,number,string])),
+      ...[-25].flatMap(lat => ([25,30,35] as number[]).map(lng => [lat, lng, '50 40% 40%'] as [number,number,string])),
+      ...[-30].flatMap(lat => ([25,30] as number[]).map(lng => [lat, lng, '80 35% 38%'] as [number,number,string])),
+      [-35, 25, '100 30% 36%'],
+      // Madagascar
+      ...[-15,-20,-25].map(lat => [lat, 48, '110 50% 40%'] as [number,number,string]),
+
+      // ── Asia ──
+      // Russia / Siberia
+      ...[65,60].flatMap(lat => ([50,60,70,80,90,100,110,120,130,140,150,160,170] as number[]).map(lng => [lat, lng, '170 20% 35%'] as [number,number,string])),
+      ...[55].flatMap(lat => ([45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140] as number[]).map(lng => [lat, lng, '160 25% 38%'] as [number,number,string])),
+      // Middle East
+      ...[35,30].flatMap(lat => ([35,40,45,50,55] as number[]).map(lng => [lat, lng, '40 50% 48%'] as [number,number,string])),
+      [25, 45, '45 55% 52%'], [25, 50, '45 55% 52%'], [25, 55, '45 55% 52%'],
+      // India
+      ...[30,25].flatMap(lat => ([70,75,80,85,90] as number[]).map(lng => [lat, lng, '80 45% 42%'] as [number,number,string])),
+      ...[20].flatMap(lat => ([72,75,78,80,82,85,88] as number[]).map(lng => [lat, lng, '100 50% 40%'] as [number,number,string])),
+      ...[15].flatMap(lat => ([75,78,80,82] as number[]).map(lng => [lat, lng, '120 50% 38%'] as [number,number,string])),
+      [10, 78, '130 55% 38%'], [10, 80, '130 55% 38%'],
+      // Sri Lanka
+      [8, 80, '130 50% 40%'],
+      // China
+      ...[45,40].flatMap(lat => ([80,85,90,95,100,105,110,115,120] as number[]).map(lng => [lat, lng, '80 35% 40%'] as [number,number,string])),
+      ...[35].flatMap(lat => ([75,80,85,90,95,100,105,110,115,120] as number[]).map(lng => [lat, lng, '90 40% 42%'] as [number,number,string])),
+      ...[30].flatMap(lat => ([90,95,100,105,110,115,120] as number[]).map(lng => [lat, lng, '100 42% 40%'] as [number,number,string])),
+      ...[25].flatMap(lat => ([98,100,105,110,115] as number[]).map(lng => [lat, lng, '110 45% 38%'] as [number,number,string])),
+      // Southeast Asia
+      ...[20,15,10].flatMap(lat => ([100,105,110] as number[]).map(lng => [lat, lng, '130 55% 40%'] as [number,number,string])),
+      [5, 105, '130 55% 38%'], [0, 105, '130 50% 36%'], [0, 110, '130 50% 36%'],
+      // Japan
+      [45, 140, '142 40% 38%'], [45, 145, '142 40% 38%'],
+      [40, 140, '142 45% 40%'], [40, 145, '142 45% 40%'],
+      [35, 135, '100 40% 42%'], [35, 140, '100 40% 42%'],
+      [30, 130, '100 45% 40%'],
+      // Korea
+      [35, 128, '120 40% 40%'], [40, 127, '120 40% 40%'],
+      // Philippines
+      ...[15,10].flatMap(lat => ([120,125] as number[]).map(lng => [lat, lng, '130 50% 40%'] as [number,number,string])),
+      // Indonesia
+      ...[-5,0].flatMap(lat => ([100,105,110,115,120,125,130,135,140] as number[]).map(lng => [lat, lng, '120 50% 36%'] as [number,number,string])),
+
+      // ── Australia ──
+      ...[-15].flatMap(lat => ([125,130,135,140,145] as number[]).map(lng => [lat, lng, '30 50% 48%'] as [number,number,string])),
+      ...[-20].flatMap(lat => ([115,120,125,130,135,140,145,150] as number[]).map(lng => [lat, lng, '25 55% 50%'] as [number,number,string])),
+      ...[-25].flatMap(lat => ([115,120,125,130,135,140,145,150,153] as number[]).map(lng => [lat, lng, '35 50% 48%'] as [number,number,string])),
+      ...[-30].flatMap(lat => ([115,120,125,130,135,140,145,150,153] as number[]).map(lng => [lat, lng, '30 45% 46%'] as [number,number,string])),
+      ...[-35].flatMap(lat => ([117,120,135,140,145,150] as number[]).map(lng => [lat, lng, '60 40% 42%'] as [number,number,string])),
+      [-38, 145, '80 35% 40%'], [-38, 148, '80 35% 40%'],
+      // New Zealand
+      [-38, 175, '130 45% 38%'], [-42, 172, '130 45% 38%'], [-45, 170, '130 45% 38%'],
+
+      // ── Greenland ──
+      ...[70,75].flatMap(lat => ([-50,-45,-40,-35,-30] as number[]).map(lng => [lat, lng, '200 15% 45%'] as [number,number,string])),
+      ...[65].flatMap(lat => ([-52,-48,-45,-42,-38] as number[]).map(lng => [lat, lng, '200 15% 42%'] as [number,number,string])),
+      [60, -45, '200 15% 40%'],
+
+      // ── Antarctica (subtle) ──
+      ...[-70,-75].flatMap(lat => ([-60,-30,0,30,60,90,120,150] as number[]).map(lng => [lat, lng, '210 10% 55%'] as [number,number,string])),
     ];
 
-    return landmasses.flatMap((mass, mi) =>
-      mass.lats.flatMap(lat =>
-        mass.lngs.map(lng => {
-          const pos = latLngToPosition(lat, lng, rotY, rotX, radius);
-          if (!pos.visible || pos.scale < 0.5) return null;
-          const size = 6 * pos.scale;
-          return (
-            <rect
-              key={`land-${mi}-${lat}-${lng}`}
-              x={pos.x + globeSize / 2 - size / 2}
-              y={pos.y + globeSize / 2 - size / 2}
-              width={size}
-              height={size}
-              rx={1}
-              fill={`hsl(142 40% 30% / ${0.15 + pos.scale * 0.15})`}
-            />
-          );
-        })
-      ).filter(Boolean)
-    );
+    // Ocean dots for depth (sparse)
+    const oceanDots: [number, number][] = [];
+    for (let lat = -60; lat <= 60; lat += 15) {
+      for (let lng = -180; lng <= 180; lng += 20) {
+        if (!land.some(([la, ln]) => Math.abs(la - lat) < 6 && Math.abs(ln - lng) < 6)) {
+          oceanDots.push([lat, lng]);
+        }
+      }
+    }
+
+    const elements: JSX.Element[] = [];
+
+    // Render ocean texture
+    oceanDots.forEach(([lat, lng], i) => {
+      const pos = latLngToPosition(lat, lng, rotY, rotX, radius);
+      if (!pos.visible || pos.scale < 0.4) return;
+      const size = 3 * pos.scale;
+      elements.push(
+        <rect
+          key={`ocean-${i}`}
+          x={pos.x + globeSize / 2 - size / 2}
+          y={pos.y + globeSize / 2 - size / 2}
+          width={size}
+          height={size}
+          fill={`hsl(211 60% 25% / ${0.06 + pos.scale * 0.04})`}
+        />
+      );
+    });
+
+    // Render land
+    land.forEach(([lat, lng, color], i) => {
+      const pos = latLngToPosition(lat, lng, rotY, rotX, radius);
+      if (!pos.visible || pos.scale < 0.4) return;
+      const size = 5 * pos.scale;
+      elements.push(
+        <rect
+          key={`land-${i}`}
+          x={pos.x + globeSize / 2 - size / 2}
+          y={pos.y + globeSize / 2 - size / 2}
+          width={size}
+          height={size}
+          fill={`hsl(${color} / ${0.25 + pos.scale * 0.35})`}
+        />
+      );
+    });
+
+    return elements;
   }, [rotY, rotX, radius]);
 
   // Region markers
