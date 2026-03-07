@@ -418,15 +418,15 @@ const InteractiveGlobe = ({
         className="absolute inset-0 rounded-full overflow-hidden"
         style={{
           background: `
-            radial-gradient(circle at 38% 35%, hsl(211 40% 22% / 0.5) 0%, transparent 50%),
-            radial-gradient(circle at 65% 70%, hsl(211 20% 10% / 0.5) 0%, transparent 50%),
-            radial-gradient(circle, hsl(211 25% 14%) 0%, hsl(240 15% 6%) 100%)
+            radial-gradient(circle at 38% 35%, hsl(211 50% 28% / 0.6) 0%, transparent 50%),
+            radial-gradient(circle at 65% 70%, hsl(211 30% 12% / 0.5) 0%, transparent 50%),
+            radial-gradient(circle, hsl(211 40% 18%) 0%, hsl(220 30% 8%) 100%)
           `,
           boxShadow: `
             inset -30px -30px 60px hsl(0 0% 0% / 0.5),
-            inset 15px 15px 30px hsl(211 40% 30% / 0.1),
-            0 0 60px hsl(var(--poke-blue) / 0.06),
-            0 0 120px hsl(var(--poke-blue) / 0.03)
+            inset 15px 15px 30px hsl(211 50% 35% / 0.12),
+            0 0 60px hsl(211 60% 40% / 0.08),
+            0 0 120px hsl(211 50% 30% / 0.04)
           `,
         }}
       >
