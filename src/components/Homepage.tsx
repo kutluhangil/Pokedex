@@ -189,7 +189,7 @@ const Stars = () => {
 };
 
 /* ── Homepage ── */
-const Homepage = ({ onNavigate }: HomepageProps) => {
+const Homepage = ({ onNavigate, onPokemonClick }: HomepageProps) => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
