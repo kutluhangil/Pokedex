@@ -67,8 +67,8 @@ const WalkingSprite = () => {
   return (
     <motion.div
       className="absolute bottom-6 pointer-events-none z-20"
-      initial={{ x: '-10vw' }}
-      animate={{ x: ['−10vw', '110vw'] as any }}
+      initial={{ x: '-15vw' }}
+      animate={{ x: ['-15vw', '115vw'] }}
       transition={{ duration: 14, repeat: Infinity, ease: 'linear', delay: 2 }}
       style={{ left: 0 }}
     >
