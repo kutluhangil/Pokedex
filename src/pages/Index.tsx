@@ -62,12 +62,14 @@ const Index = () => {
         <>
           <Homepage onNavigate={handleHomepageNavigate} onPokemonClick={handleHomepagePokemonClick} />
           {homepagePokemon && (
-            <PokemonDetail
-              pokemon={homepagePokemon}
-              onClose={() => setHomepagePokemon(null)}
-              isFavorite={isFavorite(homepagePokemon.id)}
-              onToggleFavorite={() => toggleFavorite(homepagePokemon.id)}
-            />
+            <div className="fixed inset-0 z-[60]">
+              <PokemonDetail
+                pokemon={homepagePokemon}
+                onClose={() => setHomepagePokemon(null)}
+                isFavorite={isFavorite(homepagePokemon.id)}
+                onToggleFavorite={() => toggleFavorite(homepagePokemon.id)}
+              />
+            </div>
           )}
         </>
       )}
