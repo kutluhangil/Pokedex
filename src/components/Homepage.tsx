@@ -99,7 +99,9 @@ const WalkingSprite = ({ onOpen }: { onOpen?: (id: number) => void }) => {
     setJumping(true);
     setTimeout(() => setJumping(false), 700);
     setTimeout(() => setSparkles([]), 900);
-  }, [jumping, pokemon.id]);
+    // Open detail modal after the jump animation
+    if (onOpen) setTimeout(() => onOpen(pokemon.id), 550);
+  }, [jumping, pokemon.id, onOpen]);
 
   return (
     <motion.div
