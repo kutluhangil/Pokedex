@@ -4,6 +4,7 @@ import { Compass, Search, Globe, ChevronDown } from 'lucide-react';
 
 interface HomepageProps {
   onNavigate: (tab: 'explore' | 'pokedes' | 'world') => void;
+  onPokemonClick?: (id: number) => void;
 }
 
 /* ── Pixel Pokéball ── */
@@ -66,7 +67,7 @@ interface Sparkle {
 }
 
 /* ── Walking Real Pokémon Sprite ── */
-const WalkingSprite = () => {
+const WalkingSprite = ({ onOpen }: { onOpen?: (id: number) => void }) => {
   const [jumping, setJumping] = useState(false);
   const [sparkles, setSparkles] = useState<Sparkle[]>([]);
 
@@ -98,7 +99,9 @@ const WalkingSprite = () => {
     setJumping(true);
     setTimeout(() => setJumping(false), 700);
     setTimeout(() => setSparkles([]), 900);
-  }, [jumping, pokemon.id]);
+    // Open detail modal after the jump animation
+    if (onOpen) setTimeout(() => onOpen(pokemon.id), 550);
+  }, [jumping, pokemon.id, onOpen]);
 
   return (
     <motion.div
@@ -186,7 +189,7 @@ const Stars = () => {
 };
 
 /* ── Homepage ── */
-const Homepage = ({ onNavigate }: HomepageProps) => {
+const Homepage = ({ onNavigate, onPokemonClick }: HomepageProps) => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -268,7 +271,7 @@ const Homepage = ({ onNavigate }: HomepageProps) => {
         </motion.div>
 
         {/* Walking sprite across the bottom of hero */}
-        <WalkingSprite />
+        <WalkingSprite onOpen={onPokemonClick} />
       </section>
 
       {/* ─── NAVIGATION SECTION ─── */}
