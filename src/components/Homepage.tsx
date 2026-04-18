@@ -67,7 +67,7 @@ interface Sparkle {
 }
 
 /* ── Walking Real Pokémon Sprite ── */
-const WalkingSprite = () => {
+const WalkingSprite = ({ onOpen }: { onOpen?: (id: number) => void }) => {
   const [jumping, setJumping] = useState(false);
   const [sparkles, setSparkles] = useState<Sparkle[]>([]);
 
