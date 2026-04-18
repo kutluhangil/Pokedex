@@ -271,7 +271,7 @@ const Homepage = ({ onNavigate, onPokemonClick }: HomepageProps) => {
         </motion.div>
 
         {/* Walking sprite across the bottom of hero */}
-        <WalkingSprite />
+        <WalkingSprite onOpen={onPokemonClick} />
       </section>
 
       {/* ─── NAVIGATION SECTION ─── */}
