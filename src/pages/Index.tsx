@@ -30,9 +30,6 @@ const Index = () => {
   });
   const [showHomepage, setShowHomepage] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>('explore');
-
-  const [showHomepage, setShowHomepage] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabId>('explore');
   const [homepagePokemon, setHomepagePokemon] = useState<Pokemon | null>(null);
   const { isFavorite, toggleFavorite } = useFavorites();
 
