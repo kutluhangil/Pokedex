@@ -41,8 +41,7 @@ const PixelPokeball = () => (
 
 /* ── Walking Pixel Pokémon Sprite ── */
 const WalkingSprite = () => {
-  // Pixel art Pokémon (Pikachu-esque) — 12x12 grid
-  // Y = yellow body, B = black outline/eyes, R = red cheeks, W = white eye highlight
+  const [jumping, setJumping] = useState(false);
   const sprite = [
     '....BB......',
     '...BYYB.....',
@@ -64,37 +63,61 @@ const WalkingSprite = () => {
     W: 'hsl(0 0% 100%)',
   };
 
+  const handleClick = useCallback(() => {
+    if (jumping) return;
+    // Pikachu cry (id 25)
+    const audio = new Audio('https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/25.ogg');
+    audio.volume = 0.35;
+    audio.play().catch(() => {});
+    setJumping(true);
+    setTimeout(() => setJumping(false), 700);
+  }, [jumping]);
+
   return (
     <motion.div
-      className="absolute bottom-6 pointer-events-none z-20"
+      className="absolute bottom-6 z-20"
       initial={{ x: '-15vw' }}
       animate={{ x: ['-15vw', '115vw'] }}
       transition={{ duration: 14, repeat: Infinity, ease: 'linear', delay: 2 }}
       style={{ left: 0 }}
     >
-      <motion.div
-        animate={{ y: [0, -3, 0] }}
-        transition={{ duration: 0.4, repeat: Infinity, ease: 'easeInOut' }}
-        className="grid"
-        style={{ gridTemplateColumns: 'repeat(12, 4px)', gridTemplateRows: 'repeat(12, 4px)' }}
+      <motion.button
+        onClick={handleClick}
+        aria-label="Pokémon cry"
+        className="block cursor-pointer bg-transparent border-0 p-1 -m-1"
+        animate={jumping ? { y: [0, -28, 0, -14, 0], rotate: [0, -8, 0, 6, 0] } : { y: [0, -3, 0] }}
+        transition={jumping
+          ? { duration: 0.7, ease: 'easeOut' }
+          : { duration: 0.4, repeat: Infinity, ease: 'easeInOut' }}
+        whileHover={{ scale: 1.15 }}
+        whileTap={{ scale: 0.9 }}
       >
-        {sprite.flatMap((row, ri) =>
-          row.split('').map((ch, ci) => (
-            <div
-              key={`${ri}-${ci}`}
-              style={{
-                width: 4,
-                height: 4,
-                background: ch === '.' ? 'transparent' : colorMap[ch],
-              }}
-            />
-          ))
-        )}
-      </motion.div>
+        <div
+          className="grid"
+          style={{ gridTemplateColumns: 'repeat(12, 4px)', gridTemplateRows: 'repeat(12, 4px)' }}
+        >
+          {sprite.flatMap((row, ri) =>
+            row.split('').map((ch, ci) => (
+              <div
+                key={`${ri}-${ci}`}
+                style={{
+                  width: 4,
+                  height: 4,
+                  background: ch === '.' ? 'transparent' : colorMap[ch],
+                }}
+              />
+            ))
+          )}
+        </div>
+      </motion.button>
       {/* shadow */}
       <motion.div
-        animate={{ scaleX: [1, 0.85, 1], opacity: [0.25, 0.18, 0.25] }}
-        transition={{ duration: 0.4, repeat: Infinity, ease: 'easeInOut' }}
+        animate={jumping
+          ? { scaleX: [1, 1.4, 1, 1.2, 1], opacity: [0.25, 0.08, 0.25, 0.12, 0.25] }
+          : { scaleX: [1, 0.85, 1], opacity: [0.25, 0.18, 0.25] }}
+        transition={jumping
+          ? { duration: 0.7, ease: 'easeOut' }
+          : { duration: 0.4, repeat: Infinity, ease: 'easeInOut' }}
         className="mx-auto mt-1 h-1 w-10 rounded-full bg-foreground/30 blur-[2px]"
       />
     </motion.div>
