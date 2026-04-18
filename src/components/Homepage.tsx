@@ -208,6 +208,9 @@ const Homepage = ({ onNavigate }: HomepageProps) => {
             <ChevronDown className="w-5 h-5 text-muted-foreground" />
           </motion.div>
         </motion.div>
+
+        {/* Walking sprite across the bottom of hero */}
+        <WalkingSprite />
       </section>
 
       {/* ─── NAVIGATION SECTION ─── */}
