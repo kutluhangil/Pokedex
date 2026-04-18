@@ -31,6 +31,11 @@ const Index = () => {
   const [showHomepage, setShowHomepage] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>('explore');
 
+  const [showHomepage, setShowHomepage] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabId>('explore');
+  const [homepagePokemon, setHomepagePokemon] = useState<Pokemon | null>(null);
+  const { isFavorite, toggleFavorite } = useFavorites();
+
   const handleIntroComplete = useCallback(() => {
     setShowIntro(false);
     localStorage.setItem(INTRO_KEY, 'true');
@@ -41,6 +46,15 @@ const Index = () => {
     setShowHomepage(false);
   }, []);
 
+  const handleHomepagePokemonClick = useCallback(async (id: number) => {
+    try {
+      const p = await fetchPokemon(id);
+      setHomepagePokemon(p);
+    } catch (e) {
+      console.error('Failed to load homepage pokemon', e);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-background relative">
       <AnimatePresence>
@@ -48,7 +62,17 @@ const Index = () => {
       </AnimatePresence>
 
       {!showIntro && showHomepage && (
-        <Homepage onNavigate={handleHomepageNavigate} />
+        <>
+          <Homepage onNavigate={handleHomepageNavigate} onPokemonClick={handleHomepagePokemonClick} />
+          {homepagePokemon && (
+            <PokemonDetail
+              pokemon={homepagePokemon}
+              onClose={() => setHomepagePokemon(null)}
+              isFavorite={isFavorite(homepagePokemon.id)}
+              onToggleFavorite={() => toggleFavorite(homepagePokemon.id)}
+            />
+          )}
+        </>
       )}
 
       {!showIntro && !showHomepage && (
