@@ -39,6 +39,68 @@ const PixelPokeball = () => (
   </motion.div>
 );
 
+/* ── Walking Pixel Pokémon Sprite ── */
+const WalkingSprite = () => {
+  // Pixel art Pokémon (Pikachu-esque) — 12x12 grid
+  // Y = yellow body, B = black outline/eyes, R = red cheeks, W = white eye highlight
+  const sprite = [
+    '....BB......',
+    '...BYYB.....',
+    '..BYYYYB.BB.',
+    '.BYYYYYYBYB.',
+    '.BYBYYBYYYB.',
+    '.BYWBYWBYYB.',
+    '.BYYYYYYYYB.',
+    'BYRYYYYYRYB.',
+    'BYYYYYYYYYB.',
+    '.BYYYYYYYB..',
+    '..BB..BB....',
+    '..BB..BB....',
+  ];
+  const colorMap: Record<string, string> = {
+    Y: 'hsl(48 95% 60%)',
+    B: 'hsl(var(--foreground))',
+    R: 'hsl(var(--poke-red))',
+    W: 'hsl(0 0% 100%)',
+  };
+
+  return (
+    <motion.div
+      className="absolute bottom-6 pointer-events-none z-20"
+      initial={{ x: '-15vw' }}
+      animate={{ x: ['-15vw', '115vw'] }}
+      transition={{ duration: 14, repeat: Infinity, ease: 'linear', delay: 2 }}
+      style={{ left: 0 }}
+    >
+      <motion.div
+        animate={{ y: [0, -3, 0] }}
+        transition={{ duration: 0.4, repeat: Infinity, ease: 'easeInOut' }}
+        className="grid"
+        style={{ gridTemplateColumns: 'repeat(12, 4px)', gridTemplateRows: 'repeat(12, 4px)' }}
+      >
+        {sprite.flatMap((row, ri) =>
+          row.split('').map((ch, ci) => (
+            <div
+              key={`${ri}-${ci}`}
+              style={{
+                width: 4,
+                height: 4,
+                background: ch === '.' ? 'transparent' : colorMap[ch],
+              }}
+            />
+          ))
+        )}
+      </motion.div>
+      {/* shadow */}
+      <motion.div
+        animate={{ scaleX: [1, 0.85, 1], opacity: [0.25, 0.18, 0.25] }}
+        transition={{ duration: 0.4, repeat: Infinity, ease: 'easeInOut' }}
+        className="mx-auto mt-1 h-1 w-10 rounded-full bg-foreground/30 blur-[2px]"
+      />
+    </motion.div>
+  );
+};
+
 /* ── Starfield ── */
 const Stars = () => {
   const stars = useMemo(() =>
@@ -146,6 +208,9 @@ const Homepage = ({ onNavigate }: HomepageProps) => {
             <ChevronDown className="w-5 h-5 text-muted-foreground" />
           </motion.div>
         </motion.div>
+
+        {/* Walking sprite across the bottom of hero */}
+        <WalkingSprite />
       </section>
 
       {/* ─── NAVIGATION SECTION ─── */}
