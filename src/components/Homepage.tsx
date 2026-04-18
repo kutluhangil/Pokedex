@@ -4,6 +4,7 @@ import { Compass, Search, Globe, ChevronDown } from 'lucide-react';
 
 interface HomepageProps {
   onNavigate: (tab: 'explore' | 'pokedes' | 'world') => void;
+  onPokemonClick?: (id: number) => void;
 }
 
 /* ── Pixel Pokéball ── */
