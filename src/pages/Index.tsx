@@ -8,6 +8,10 @@ import SearchTab from '@/components/SearchTab';
 import CollectionTab from '@/components/CollectionTab';
 import WorldTab from '@/components/WorldTab';
 import Particles from '@/components/Particles';
+import PokemonDetail from '@/components/PokemonDetail';
+import { fetchPokemon } from '@/lib/api';
+import { Pokemon } from '@/lib/pokemon';
+import { useFavorites } from '@/hooks/useFavorites';
 
 const INTRO_KEY = 'pokedex-intro-seen';
 
