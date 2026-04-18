@@ -39,87 +39,122 @@ const PixelPokeball = () => (
   </motion.div>
 );
 
-/* ── Walking Pixel Pokémon Sprite ── */
+/* ── Popular Pokémon Pool (most iconic 10) ── */
+const POPULAR_POKEMON = [
+  { id: 25, name: 'pikachu' },
+  { id: 1, name: 'bulbasaur' },
+  { id: 4, name: 'charmander' },
+  { id: 7, name: 'squirtle' },
+  { id: 133, name: 'eevee' },
+  { id: 39, name: 'jigglypuff' },
+  { id: 143, name: 'snorlax' },
+  { id: 150, name: 'mewtwo' },
+  { id: 94, name: 'gengar' },
+  { id: 131, name: 'lapras' },
+];
+
+const spriteUrl = (id: number) =>
+  `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+const cryUrl = (id: number) =>
+  `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${id}.ogg`;
+
+interface Sparkle {
+  id: number;
+  x: number;
+  y: number;
+  color: string;
+}
+
+/* ── Walking Real Pokémon Sprite ── */
 const WalkingSprite = () => {
   const [jumping, setJumping] = useState(false);
-  const sprite = [
-    '....BB......',
-    '...BYYB.....',
-    '..BYYYYB.BB.',
-    '.BYYYYYYBYB.',
-    '.BYBYYBYYYB.',
-    '.BYWBYWBYYB.',
-    '.BYYYYYYYYB.',
-    'BYRYYYYYRYB.',
-    'BYYYYYYYYYB.',
-    '.BYYYYYYYB..',
-    '..BB..BB....',
-    '..BB..BB....',
-  ];
-  const colorMap: Record<string, string> = {
-    Y: 'hsl(48 95% 60%)',
-    B: 'hsl(var(--foreground))',
-    R: 'hsl(var(--poke-red))',
-    W: 'hsl(0 0% 100%)',
-  };
+  const [sparkles, setSparkles] = useState<Sparkle[]>([]);
+
+  // Pick a random popular Pokémon on each page load
+  const pokemon = useMemo(
+    () => POPULAR_POKEMON[Math.floor(Math.random() * POPULAR_POKEMON.length)],
+    []
+  );
 
   const handleClick = useCallback(() => {
     if (jumping) return;
-    // Pikachu cry (id 25)
-    const audio = new Audio('https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/25.ogg');
+    const audio = new Audio(cryUrl(pokemon.id));
     audio.volume = 0.35;
     audio.play().catch(() => {});
+
+    const colors = [
+      'hsl(48 100% 65%)',
+      'hsl(var(--poke-red))',
+      'hsl(var(--poke-blue))',
+      'hsl(0 0% 100%)',
+    ];
+    const newSparkles: Sparkle[] = Array.from({ length: 12 }, (_, i) => ({
+      id: Date.now() + i,
+      x: (Math.random() - 0.5) * 120,
+      y: (Math.random() - 0.5) * 120 - 20,
+      color: colors[Math.floor(Math.random() * colors.length)],
+    }));
+    setSparkles(newSparkles);
     setJumping(true);
     setTimeout(() => setJumping(false), 700);
-  }, [jumping]);
+    setTimeout(() => setSparkles([]), 900);
+  }, [jumping, pokemon.id]);
 
   return (
     <motion.div
       className="absolute bottom-6 z-20"
       initial={{ x: '-15vw' }}
       animate={{ x: ['-15vw', '115vw'] }}
-      transition={{ duration: 14, repeat: Infinity, ease: 'linear', delay: 2 }}
+      transition={{ duration: 16, repeat: Infinity, ease: 'linear', delay: 1.5 }}
       style={{ left: 0 }}
     >
-      <motion.button
-        onClick={handleClick}
-        aria-label="Pokémon cry"
-        className="block cursor-pointer bg-transparent border-0 p-1 -m-1"
-        animate={jumping ? { y: [0, -28, 0, -14, 0], rotate: [0, -8, 0, 6, 0] } : { y: [0, -3, 0] }}
-        transition={jumping
-          ? { duration: 0.7, ease: 'easeOut' }
-          : { duration: 0.4, repeat: Infinity, ease: 'easeInOut' }}
-        whileHover={{ scale: 1.15 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        <div
-          className="grid"
-          style={{ gridTemplateColumns: 'repeat(12, 4px)', gridTemplateRows: 'repeat(12, 4px)' }}
+      <div className="relative">
+        {sparkles.map((s) => (
+          <motion.div
+            key={s.id}
+            className="absolute top-1/2 left-1/2 pointer-events-none rounded-sm"
+            initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
+            animate={{ x: s.x, y: s.y, opacity: 0, scale: [0, 1.2, 0.8] }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            style={{
+              width: 4,
+              height: 4,
+              background: s.color,
+              boxShadow: `0 0 6px ${s.color}`,
+            }}
+          />
+        ))}
+
+        <motion.button
+          onClick={handleClick}
+          aria-label={`${pokemon.name} cry`}
+          className="block cursor-pointer bg-transparent border-0 p-1 -m-1"
+          animate={jumping ? { y: [0, -28, 0, -14, 0], rotate: [0, -8, 0, 6, 0] } : { y: [0, -3, 0] }}
+          transition={jumping
+            ? { duration: 0.7, ease: 'easeOut' }
+            : { duration: 0.4, repeat: Infinity, ease: 'easeInOut' }}
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.9 }}
         >
-          {sprite.flatMap((row, ri) =>
-            row.split('').map((ch, ci) => (
-              <div
-                key={`${ri}-${ci}`}
-                style={{
-                  width: 4,
-                  height: 4,
-                  background: ch === '.' ? 'transparent' : colorMap[ch],
-                }}
-              />
-            ))
-          )}
-        </div>
-      </motion.button>
-      {/* shadow */}
-      <motion.div
-        animate={jumping
-          ? { scaleX: [1, 1.4, 1, 1.2, 1], opacity: [0.25, 0.08, 0.25, 0.12, 0.25] }
-          : { scaleX: [1, 0.85, 1], opacity: [0.25, 0.18, 0.25] }}
-        transition={jumping
-          ? { duration: 0.7, ease: 'easeOut' }
-          : { duration: 0.4, repeat: Infinity, ease: 'easeInOut' }}
-        className="mx-auto mt-1 h-1 w-10 rounded-full bg-foreground/30 blur-[2px]"
-      />
+          <img
+            src={spriteUrl(pokemon.id)}
+            alt={pokemon.name}
+            width={56}
+            height={56}
+            style={{ imageRendering: 'pixelated' }}
+            draggable={false}
+          />
+        </motion.button>
+        <motion.div
+          animate={jumping
+            ? { scaleX: [1, 1.4, 1, 1.2, 1], opacity: [0.25, 0.08, 0.25, 0.12, 0.25] }
+            : { scaleX: [1, 0.85, 1], opacity: [0.25, 0.18, 0.25] }}
+          transition={jumping
+            ? { duration: 0.7, ease: 'easeOut' }
+            : { duration: 0.4, repeat: Infinity, ease: 'easeInOut' }}
+          className="mx-auto mt-0.5 h-1 w-10 rounded-full bg-foreground/30 blur-[2px]"
+        />
+      </div>
     </motion.div>
   );
 };
