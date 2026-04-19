@@ -4,6 +4,7 @@ import { X, Heart, Sparkles } from 'lucide-react';
 import { Pokemon, PokemonSpecies, TYPE_COLORS, getArtwork, getPixelSprite, formatPokemonId, capitalize } from '@/lib/pokemon';
 import { fetchPokemonSpecies, fetchEvolutionChain } from '@/lib/api';
 import CryPlayer from '@/components/CryPlayer';
+import TypeEffectiveness from '@/components/TypeEffectiveness';
 
 interface PokemonDetailProps {
   pokemon: Pokemon;
@@ -232,6 +233,11 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite }: Pokem
                       </div>
                     ))}
                   </div>
+                </div>
+
+                {/* Type effectiveness */}
+                <div className="mb-8">
+                  <TypeEffectiveness defenderTypes={pokemon.types.map(t => t.type.name)} />
                 </div>
 
                 {/* Evolution */}
