@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Pokemon, TYPE_COLORS, getPixelSprite, formatPokemonId, capitalize } from '@/lib/pokemon';
-import { Heart } from 'lucide-react';
+import { Heart, Plus, Check } from 'lucide-react';
 
 interface PokemonCardProps {
   pokemon: Pokemon;
@@ -8,9 +8,19 @@ interface PokemonCardProps {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   index?: number;
+  isInCompare?: boolean;
+  onToggleCompare?: () => void;
 }
 
-const PokemonCard = ({ pokemon, onClick, isFavorite, onToggleFavorite, index = 0 }: PokemonCardProps) => {
+const PokemonCard = ({
+  pokemon,
+  onClick,
+  isFavorite,
+  onToggleFavorite,
+  index = 0,
+  isInCompare = false,
+  onToggleCompare,
+}: PokemonCardProps) => {
   const mainType = pokemon.types[0]?.type.name || 'normal';
   const typeColor = TYPE_COLORS[mainType] || TYPE_COLORS.normal;
   const sprite = getPixelSprite(pokemon);
@@ -31,7 +41,6 @@ const PokemonCard = ({ pokemon, onClick, isFavorite, onToggleFavorite, index = 0
           boxShadow: `0 0 12px hsl(${typeColor} / 0.1), 0 4px 20px hsl(0 0% 0% / 0.3)`,
         }}
       >
-        {/* Type gradient background */}
         <div
           className="absolute inset-0 opacity-20"
           style={{
@@ -39,22 +48,35 @@ const PokemonCard = ({ pokemon, onClick, isFavorite, onToggleFavorite, index = 0
           }}
         />
 
-        {/* Favorite button */}
-        <button
-          onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
-          className="absolute top-3 right-3 z-10 p-1.5 rounded-lg glass"
-        >
-          <Heart
-            className={`w-3.5 h-3.5 transition-colors ${isFavorite ? 'fill-poke-red text-poke-red' : 'text-muted-foreground'}`}
-          />
-        </button>
+        {/* Top action buttons */}
+        <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5">
+          <button
+            onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
+            className="p-1.5 rounded-lg glass"
+            aria-label="Favorite"
+          >
+            <Heart
+              className={`w-3.5 h-3.5 transition-colors ${isFavorite ? 'fill-poke-red text-poke-red' : 'text-muted-foreground'}`}
+            />
+          </button>
+          {onToggleCompare && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggleCompare(); }}
+              className={`p-1.5 rounded-lg glass transition-colors ${
+                isInCompare ? 'border border-poke-blue/60 text-poke-blue' : 'text-muted-foreground hover:text-poke-blue'
+              }`}
+              aria-label="Compare"
+              title="Add to compare"
+            >
+              {isInCompare ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+            </button>
+          )}
+        </div>
 
-        {/* Pokemon ID */}
         <span className="absolute top-3 left-3 font-pixel text-[7px] text-muted-foreground">
           {formatPokemonId(pokemon.id)}
         </span>
 
-        {/* Sprite */}
         <div className="flex items-center justify-center pt-8 pb-2 h-40 md:h-44">
           <motion.img
             src={sprite}
@@ -66,7 +88,6 @@ const PokemonCard = ({ pokemon, onClick, isFavorite, onToggleFavorite, index = 0
           />
         </div>
 
-        {/* Info */}
         <div className="px-4 pb-4">
           <h3 className="font-pixel text-[9px] md:text-[10px] text-foreground mb-2 truncate">
             {capitalize(pokemon.name)}
@@ -88,7 +109,6 @@ const PokemonCard = ({ pokemon, onClick, isFavorite, onToggleFavorite, index = 0
           </div>
         </div>
 
-        {/* Hover glow - subtle */}
         <motion.div
           className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           style={{
