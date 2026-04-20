@@ -63,6 +63,27 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavig
   const isLegendary = species?.is_legendary || false;
   const isMythical = species?.is_mythical || false;
 
+  // Navigate to a sibling Pokémon (prev/next by ID)
+  const goToOffset = useCallback(async (offset: number) => {
+    if (!onNavigate) return;
+    const target = pokemon.id + offset;
+    if (target < 1 || target > 1025) return;
+    try {
+      const next = await fetchPokemon(target);
+      onNavigate(next);
+    } catch {}
+  }, [pokemon.id, onNavigate]);
+
+  // Keyboard shortcuts within the detail modal
+  useKeyboardShortcuts([
+    { key: 'Escape', handler: () => onClose() },
+    { key: 's', handler: () => setShowShiny(s => !s) },
+    { key: 'f', handler: () => onToggleFavorite() },
+    { key: 'ArrowLeft',  handler: () => goToOffset(-1) },
+    { key: 'ArrowRight', handler: () => goToOffset(1) },
+  ]);
+
+
   return (
     <AnimatePresence>
       <motion.div
