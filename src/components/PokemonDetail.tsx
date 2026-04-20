@@ -265,22 +265,15 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavig
                   <TypeEffectiveness defenderTypes={pokemon.types.map(t => t.type.name)} />
                 </div>
 
-                {/* Evolution */}
-                {evolutionNames.length > 1 && (
+                {/* Evolution Tree */}
+                {species && (
                   <div className="mb-8">
                     <h3 className="font-pixel text-[8px] text-muted-foreground mb-4 tracking-wider">EVOLUTION</h3>
-                    <div className="flex items-center justify-center gap-2 flex-wrap">
-                      {evolutionNames.map((name, i) => (
-                        <div key={name} className="flex items-center gap-2">
-                          <span className={`px-3 py-1.5 rounded-lg glass text-xs ${name === pokemon.name ? 'neon-border-red text-foreground' : 'text-muted-foreground'}`}>
-                            {capitalize(name)}
-                          </span>
-                          {i < evolutionNames.length - 1 && (
-                            <span className="text-muted-foreground/40 text-xs">→</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                    <EvolutionTree
+                      speciesUrl={`https://pokeapi.co/api/v2/pokemon-species/${pokemon.id}/`}
+                      currentName={pokemon.name}
+                      onSelect={(id) => goToOffset(id - pokemon.id)}
+                    />
                   </div>
                 )}
               </>
