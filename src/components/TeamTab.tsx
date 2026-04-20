@@ -1,11 +1,12 @@
 import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Trash2, Shield, Swords } from 'lucide-react';
+import { Plus, X, Trash2, Shield, Swords, Share2 } from 'lucide-react';
 import { Pokemon, capitalize, getArtwork, getPixelSprite, formatPokemonId, TYPE_COLORS } from '@/lib/pokemon';
 import { useTeam, TEAM_SIZE } from '@/hooks/useTeam';
 import { ALL_TYPES, getDefensiveChart, getOffensiveChart, multiplierColor, multiplierLabel, PokeType } from '@/lib/typeChart';
 import PokemonPicker from '@/components/PokemonPicker';
 import PokemonDetail from '@/components/PokemonDetail';
+import TeamShare from '@/components/TeamShare';
 import { useFavorites } from '@/hooks/useFavorites';
 
 const TeamTab = () => {
@@ -14,6 +15,7 @@ const TeamTab = () => {
   const [pickingSlot, setPickingSlot] = useState<number | null>(null);
   const [viewing, setViewing] = useState<Pokemon | null>(null);
   const [activeTab, setActiveTab] = useState<'defense' | 'offense'>('defense');
+  const [sharing, setSharing] = useState(false);
 
   const filled = useMemo(() => team.filter((p): p is Pokemon => p !== null), [team]);
 
@@ -62,16 +64,28 @@ const TeamTab = () => {
           <p className="text-xs text-muted-foreground mt-1">Build & analyze your squad</p>
         </div>
         {filled.length > 0 && (
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={clear}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl glass font-pixel text-[8px] text-muted-foreground hover:text-poke-red transition-colors"
-          >
-            <Trash2 className="w-3 h-3" />
-            CLEAR
-          </motion.button>
+          <div className="flex items-center gap-2">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setSharing(true)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl glass font-pixel text-[8px] text-muted-foreground hover:text-poke-blue transition-colors"
+            >
+              <Share2 className="w-3 h-3" />
+              SHARE
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={clear}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl glass font-pixel text-[8px] text-muted-foreground hover:text-poke-red transition-colors"
+            >
+              <Trash2 className="w-3 h-3" />
+              CLEAR
+            </motion.button>
+          </div>
         )}
       </div>
+
+      <TeamShare team={team} open={sharing} onClose={() => setSharing(false)} />
 
       {/* Slots */}
       <div className="px-6 mb-8">
