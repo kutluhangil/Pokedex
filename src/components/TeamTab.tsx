@@ -242,6 +242,7 @@ const TeamTab = () => {
           onClose={() => setViewing(null)}
           isFavorite={isFavorite(viewing.id)}
           onToggleFavorite={() => toggleFavorite(viewing.id)}
+          onNavigate={(next) => setViewing(next)}
         />
       )}
     </div>
