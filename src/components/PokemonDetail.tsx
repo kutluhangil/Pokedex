@@ -29,26 +29,12 @@ const STAT_NAMES: Record<string, string> = {
 const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavigate }: PokemonDetailProps) => {
   const [species, setSpecies] = useState<PokemonSpecies | null>(null);
   const [showShiny, setShowShiny] = useState(false);
-  const [evolutionNames, setEvolutionNames] = useState<string[]>([]);
   const [activeSection, setActiveSection] = useState<'stats' | 'lore'>('stats');
   const mainType = pokemon.types[0]?.type.name || 'normal';
   const typeColor = TYPE_COLORS[mainType] || TYPE_COLORS.normal;
 
   useEffect(() => {
-    fetchPokemonSpecies(pokemon.id).then(async (sp) => {
-      setSpecies(sp);
-      try {
-        const evo = await fetchEvolutionChain(sp.evolution_chain.url);
-        const names: string[] = [];
-        let node = evo.chain;
-        names.push(node.species.name);
-        while (node.evolves_to.length > 0) {
-          node = node.evolves_to[0];
-          names.push(node.species.name);
-        }
-        setEvolutionNames(names);
-      } catch {}
-    });
+    fetchPokemonSpecies(pokemon.id).then(setSpecies).catch(() => {});
   }, [pokemon.id]);
 
   const description = species?.flavor_text_entries
