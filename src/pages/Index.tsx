@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Compass, Search, BookOpen, Home, Globe, Gamepad2, Users } from 'lucide-react';
+import { Compass, Search, BookOpen, Home, Globe, Gamepad2, Users, Swords } from 'lucide-react';
 import IntroScreen from '@/components/IntroScreen';
 import Homepage from '@/components/Homepage';
 import ExploreTab from '@/components/ExploreTab';
@@ -9,11 +9,15 @@ import CollectionTab from '@/components/CollectionTab';
 import WorldTab from '@/components/WorldTab';
 import GameTab from '@/components/GameTab';
 import TeamTab from '@/components/TeamTab';
+import BattleTab from '@/components/BattleTab';
 import Particles from '@/components/Particles';
 import PokemonDetail from '@/components/PokemonDetail';
+import ShortcutsHelp from '@/components/ShortcutsHelp';
 import { fetchPokemon } from '@/lib/api';
 import { Pokemon } from '@/lib/pokemon';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useTeam } from '@/hooks/useTeam';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 const INTRO_KEY = 'pokedex-intro-seen';
 
@@ -22,6 +26,7 @@ const tabs = [
   { id: 'pokedes', label: 'Dex', icon: Search },
   { id: 'world', label: 'World', icon: Globe },
   { id: 'team', label: 'Team', icon: Users },
+  { id: 'battle', label: 'Battle', icon: Swords },
   { id: 'game', label: 'Game', icon: Gamepad2 },
   { id: 'collection', label: 'Coll.', icon: BookOpen },
 ] as const;
@@ -29,13 +34,13 @@ const tabs = [
 type TabId = typeof tabs[number]['id'];
 
 const Index = () => {
-  const [showIntro, setShowIntro] = useState(() => {
-    return !localStorage.getItem(INTRO_KEY);
-  });
+  const [showIntro, setShowIntro] = useState(() => !localStorage.getItem(INTRO_KEY));
   const [showHomepage, setShowHomepage] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>('explore');
   const [homepagePokemon, setHomepagePokemon] = useState<Pokemon | null>(null);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { setTeamFromIds } = useTeam();
 
   const handleIntroComplete = useCallback(() => {
     setShowIntro(false);
@@ -56,6 +61,45 @@ const Index = () => {
     }
   }, []);
 
+  // Import a shared team from ?team=1,2,3 in the URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const teamParam = params.get('team');
+    if (teamParam) {
+      const ids = teamParam.split(',').map(s => parseInt(s, 10)).filter(n => !isNaN(n));
+      if (ids.length > 0) {
+        setTeamFromIds(ids).then(() => {
+          setShowHomepage(false);
+          setActiveTab('team');
+        });
+        // Clean the URL so a refresh doesn't re-import
+        params.delete('team');
+        const newSearch = params.toString();
+        window.history.replaceState({}, '', `${window.location.pathname}${newSearch ? '?' + newSearch : ''}`);
+      }
+    }
+  }, [setTeamFromIds]);
+
+  // Global keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: '/',
+      handler: (e) => {
+        e.preventDefault();
+        setShowHomepage(false);
+        setActiveTab('pokedes');
+      },
+    },
+    {
+      key: '?',
+      handler: () => setShowShortcuts(s => !s),
+    },
+    {
+      key: 'Escape',
+      handler: () => setShowShortcuts(false),
+    },
+  ]);
+
   return (
     <div className="min-h-screen bg-background relative">
       <AnimatePresence>
@@ -72,6 +116,7 @@ const Index = () => {
                 onClose={() => setHomepagePokemon(null)}
                 isFavorite={isFavorite(homepagePokemon.id)}
                 onToggleFavorite={() => toggleFavorite(homepagePokemon.id)}
+                onNavigate={(next) => setHomepagePokemon(next)}
               />
             </div>
           )}
@@ -96,6 +141,7 @@ const Index = () => {
                 {activeTab === 'pokedes' && <SearchTab />}
                 {activeTab === 'world' && <WorldTab />}
                 {activeTab === 'team' && <TeamTab />}
+                {activeTab === 'battle' && <BattleTab />}
                 {activeTab === 'game' && <GameTab />}
                 {activeTab === 'collection' && <CollectionTab />}
               </motion.div>
@@ -109,7 +155,7 @@ const Index = () => {
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowHomepage(true)}
-                className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+                className="flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-xl transition-colors text-muted-foreground hover:text-foreground"
               >
                 <Home className="w-4 h-4" />
                 <span className="font-pixel text-[6px]">Home</span>
@@ -123,7 +169,7 @@ const Index = () => {
                     key={tab.id}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`relative flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-colors ${
+                    className={`relative flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-xl transition-colors ${
                       isActive ? 'text-poke-red' : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
@@ -145,6 +191,9 @@ const Index = () => {
           </nav>
         </>
       )}
+
+      {/* Global shortcuts panel */}
+      <ShortcutsHelp open={showShortcuts} onClose={() => setShowShortcuts(false)} />
     </div>
   );
 };

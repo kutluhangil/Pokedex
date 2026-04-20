@@ -1,16 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, Sparkles } from 'lucide-react';
+import { X, Heart, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Pokemon, PokemonSpecies, TYPE_COLORS, getArtwork, getPixelSprite, formatPokemonId, capitalize } from '@/lib/pokemon';
-import { fetchPokemonSpecies, fetchEvolutionChain } from '@/lib/api';
+import { fetchPokemon, fetchPokemonSpecies } from '@/lib/api';
 import CryPlayer from '@/components/CryPlayer';
 import TypeEffectiveness from '@/components/TypeEffectiveness';
+import EvolutionTree from '@/components/EvolutionTree';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 interface PokemonDetailProps {
   pokemon: Pokemon;
   onClose: () => void;
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  /** Optional: when provided, enables ←/→ keyboard nav between Pokémon. */
+  onNavigate?: (next: Pokemon) => void;
 }
 
 const STAT_NAMES: Record<string, string> = {
@@ -22,29 +26,15 @@ const STAT_NAMES: Record<string, string> = {
   speed: 'SPD',
 };
 
-const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite }: PokemonDetailProps) => {
+const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavigate }: PokemonDetailProps) => {
   const [species, setSpecies] = useState<PokemonSpecies | null>(null);
   const [showShiny, setShowShiny] = useState(false);
-  const [evolutionNames, setEvolutionNames] = useState<string[]>([]);
   const [activeSection, setActiveSection] = useState<'stats' | 'lore'>('stats');
   const mainType = pokemon.types[0]?.type.name || 'normal';
   const typeColor = TYPE_COLORS[mainType] || TYPE_COLORS.normal;
 
   useEffect(() => {
-    fetchPokemonSpecies(pokemon.id).then(async (sp) => {
-      setSpecies(sp);
-      try {
-        const evo = await fetchEvolutionChain(sp.evolution_chain.url);
-        const names: string[] = [];
-        let node = evo.chain;
-        names.push(node.species.name);
-        while (node.evolves_to.length > 0) {
-          node = node.evolves_to[0];
-          names.push(node.species.name);
-        }
-        setEvolutionNames(names);
-      } catch {}
-    });
+    fetchPokemonSpecies(pokemon.id).then(setSpecies).catch(() => {});
   }, [pokemon.id]);
 
   const description = species?.flavor_text_entries
@@ -58,6 +48,27 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite }: Pokem
   const shinySprite = pokemon.sprites.front_shiny;
   const isLegendary = species?.is_legendary || false;
   const isMythical = species?.is_mythical || false;
+
+  // Navigate to a sibling Pokémon (prev/next by ID)
+  const goToOffset = useCallback(async (offset: number) => {
+    if (!onNavigate) return;
+    const target = pokemon.id + offset;
+    if (target < 1 || target > 1025) return;
+    try {
+      const next = await fetchPokemon(target);
+      onNavigate(next);
+    } catch {}
+  }, [pokemon.id, onNavigate]);
+
+  // Keyboard shortcuts within the detail modal
+  useKeyboardShortcuts([
+    { key: 'Escape', handler: () => onClose() },
+    { key: 's', handler: () => setShowShiny(s => !s) },
+    { key: 'f', handler: () => onToggleFavorite() },
+    { key: 'ArrowLeft',  handler: () => goToOffset(-1) },
+    { key: 'ArrowRight', handler: () => goToOffset(1) },
+  ]);
+
 
   return (
     <AnimatePresence>
@@ -120,8 +131,17 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite }: Pokem
             </div>
           </div>
 
-          {/* Sprite */}
-          <div className="relative flex justify-center py-6">
+          {/* Sprite + nav arrows */}
+          <div className="relative flex items-center justify-center py-6 gap-2">
+            {onNavigate && pokemon.id > 1 && (
+              <button
+                onClick={() => goToOffset(-1)}
+                aria-label="Previous Pokémon"
+                className="p-2 rounded-lg glass hover:bg-muted/30 transition-colors text-muted-foreground hover:text-foreground"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+            )}
             <motion.img
               key={showShiny ? 'shiny' : 'normal'}
               src={showShiny ? (shinySprite || pixelSprite) : (artwork || pixelSprite)}
@@ -133,6 +153,15 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite }: Pokem
               transition={{ type: 'spring', damping: 20 }}
               loading="lazy"
             />
+            {onNavigate && pokemon.id < 1025 && (
+              <button
+                onClick={() => goToOffset(1)}
+                aria-label="Next Pokémon"
+                className="p-2 rounded-lg glass hover:bg-muted/30 transition-colors text-muted-foreground hover:text-foreground"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           {/* Info */}
@@ -240,22 +269,15 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite }: Pokem
                   <TypeEffectiveness defenderTypes={pokemon.types.map(t => t.type.name)} />
                 </div>
 
-                {/* Evolution */}
-                {evolutionNames.length > 1 && (
+                {/* Evolution Tree */}
+                {species && (
                   <div className="mb-8">
                     <h3 className="font-pixel text-[8px] text-muted-foreground mb-4 tracking-wider">EVOLUTION</h3>
-                    <div className="flex items-center justify-center gap-2 flex-wrap">
-                      {evolutionNames.map((name, i) => (
-                        <div key={name} className="flex items-center gap-2">
-                          <span className={`px-3 py-1.5 rounded-lg glass text-xs ${name === pokemon.name ? 'neon-border-red text-foreground' : 'text-muted-foreground'}`}>
-                            {capitalize(name)}
-                          </span>
-                          {i < evolutionNames.length - 1 && (
-                            <span className="text-muted-foreground/40 text-xs">→</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                    <EvolutionTree
+                      speciesUrl={`https://pokeapi.co/api/v2/pokemon-species/${pokemon.id}/`}
+                      currentName={pokemon.name}
+                      onSelect={(id) => goToOffset(id - pokemon.id)}
+                    />
                   </div>
                 )}
               </>

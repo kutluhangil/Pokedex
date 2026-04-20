@@ -129,6 +129,7 @@ const CollectionTab = () => {
           onClose={() => setSelected(null)}
           isFavorite={isFavorite(selected.id)}
           onToggleFavorite={() => toggleFavorite(selected.id)}
+          onNavigate={(next) => setSelected(next)}
         />
       )}
     </div>

@@ -45,5 +45,15 @@ export function useTeam() {
 
   const clear = useCallback(() => setTeam(Array(TEAM_SIZE).fill(null)), []);
 
-  return { team, setSlot, removeSlot, clear, loaded };
+  /** Replace whole team from a list of IDs (used by share-link import). */
+  const setTeamFromIds = useCallback(async (ids: number[]) => {
+    const fetched = await Promise.all(
+      ids.slice(0, TEAM_SIZE).map(id => fetchPokemon(id).catch(() => null))
+    );
+    const padded: (Pokemon | null)[] = [...fetched];
+    while (padded.length < TEAM_SIZE) padded.push(null);
+    setTeam(padded);
+  }, []);
+
+  return { team, setSlot, removeSlot, clear, loaded, setTeamFromIds };
 }

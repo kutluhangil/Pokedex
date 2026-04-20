@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Compass, Search, Globe, ChevronDown } from 'lucide-react';
+import DailyPokemon from '@/components/DailyPokemon';
 
 interface HomepageProps {
   onNavigate: (tab: 'explore' | 'pokedes' | 'world') => void;
@@ -274,8 +275,13 @@ const Homepage = ({ onNavigate, onPokemonClick }: HomepageProps) => {
         <WalkingSprite onOpen={onPokemonClick} />
       </section>
 
+      {/* ─── DAILY POKÉMON ─── */}
+      <section className="relative z-10 px-6 pb-10 -mt-6">
+        <DailyPokemon onClick={onPokemonClick} />
+      </section>
+
       {/* ─── NAVIGATION SECTION ─── */}
-      <section className="relative z-10 px-6 pb-20 -mt-10">
+      <section className="relative z-10 px-6 pb-20">
         <div className="max-w-md mx-auto space-y-4">
           {navItems.map((item, i) => {
             const Icon = item.icon;
