@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Compass, Search, Globe, ChevronDown } from 'lucide-react';
+import DailyPokemon from '@/components/DailyPokemon';
 
 interface HomepageProps {
   onNavigate: (tab: 'explore' | 'pokedes' | 'world') => void;
