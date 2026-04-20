@@ -1,16 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, Sparkles } from 'lucide-react';
+import { X, Heart, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Pokemon, PokemonSpecies, TYPE_COLORS, getArtwork, getPixelSprite, formatPokemonId, capitalize } from '@/lib/pokemon';
-import { fetchPokemonSpecies, fetchEvolutionChain } from '@/lib/api';
+import { fetchPokemon, fetchPokemonSpecies, fetchEvolutionChain } from '@/lib/api';
 import CryPlayer from '@/components/CryPlayer';
 import TypeEffectiveness from '@/components/TypeEffectiveness';
+import EvolutionTree from '@/components/EvolutionTree';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 interface PokemonDetailProps {
   pokemon: Pokemon;
   onClose: () => void;
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  /** Optional: when provided, enables ←/→ keyboard nav between Pokémon. */
+  onNavigate?: (next: Pokemon) => void;
 }
 
 const STAT_NAMES: Record<string, string> = {
@@ -22,7 +26,7 @@ const STAT_NAMES: Record<string, string> = {
   speed: 'SPD',
 };
 
-const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite }: PokemonDetailProps) => {
+const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavigate }: PokemonDetailProps) => {
   const [species, setSpecies] = useState<PokemonSpecies | null>(null);
   const [showShiny, setShowShiny] = useState(false);
   const [evolutionNames, setEvolutionNames] = useState<string[]>([]);
