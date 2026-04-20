@@ -145,8 +145,17 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavig
             </div>
           </div>
 
-          {/* Sprite */}
-          <div className="relative flex justify-center py-6">
+          {/* Sprite + nav arrows */}
+          <div className="relative flex items-center justify-center py-6 gap-2">
+            {onNavigate && pokemon.id > 1 && (
+              <button
+                onClick={() => goToOffset(-1)}
+                aria-label="Previous Pokémon"
+                className="p-2 rounded-lg glass hover:bg-muted/30 transition-colors text-muted-foreground hover:text-foreground"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+            )}
             <motion.img
               key={showShiny ? 'shiny' : 'normal'}
               src={showShiny ? (shinySprite || pixelSprite) : (artwork || pixelSprite)}
@@ -158,6 +167,15 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavig
               transition={{ type: 'spring', damping: 20 }}
               loading="lazy"
             />
+            {onNavigate && pokemon.id < 1025 && (
+              <button
+                onClick={() => goToOffset(1)}
+                aria-label="Next Pokémon"
+                className="p-2 rounded-lg glass hover:bg-muted/30 transition-colors text-muted-foreground hover:text-foreground"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           {/* Info */}
