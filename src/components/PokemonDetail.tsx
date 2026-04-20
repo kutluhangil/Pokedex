@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Pokemon, PokemonSpecies, TYPE_COLORS, getArtwork, getPixelSprite, formatPokemonId, capitalize } from '@/lib/pokemon';
-import { fetchPokemon, fetchPokemonSpecies, fetchEvolutionChain } from '@/lib/api';
+import { fetchPokemon, fetchPokemonSpecies } from '@/lib/api';
 import CryPlayer from '@/components/CryPlayer';
 import TypeEffectiveness from '@/components/TypeEffectiveness';
 import EvolutionTree from '@/components/EvolutionTree';
