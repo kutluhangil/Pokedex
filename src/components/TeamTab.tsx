@@ -7,6 +7,7 @@ import { ALL_TYPES, getDefensiveChart, getOffensiveChart, multiplierColor, multi
 import PokemonPicker from '@/components/PokemonPicker';
 import PokemonDetail from '@/components/PokemonDetail';
 import TeamShare from '@/components/TeamShare';
+import ExportShareButton from '@/components/ExportShareButton';
 import { useFavorites } from '@/hooks/useFavorites';
 
 const TeamTab = () => {
@@ -65,6 +66,11 @@ const TeamTab = () => {
         </div>
         {filled.length > 0 && (
           <div className="flex items-center gap-2">
+            <ExportShareButton
+              mode={{ kind: 'team', team }}
+              filename="my-squad"
+              label="EXPORT"
+            />
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => setSharing(true)}

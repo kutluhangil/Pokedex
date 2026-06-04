@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Pokemon, TYPE_COLORS, getArtwork, formatPokemonId, capitalize } from '@/lib/pokemon';
+import ExportShareButton from '@/components/ExportShareButton';
 
 interface Props {
   pokemon: [Pokemon, Pokemon];
@@ -82,9 +83,16 @@ const CompareModal = ({ pokemon, onClose }: Props) => {
         >
           <div className="flex items-center justify-between p-4">
             <h2 className="font-pixel text-[10px] text-poke-blue tracking-widest">VS</h2>
-            <button onClick={onClose} className="p-2 rounded-lg glass hover:bg-muted/30 transition-colors">
-              <X className="w-4 h-4 text-muted-foreground" />
-            </button>
+            <div className="flex items-center gap-2">
+              <ExportShareButton
+                mode={{ kind: 'compare', pair: [a, b] }}
+                filename={`vs-${a.name}-${b.name}`}
+                label="EXPORT"
+              />
+              <button onClick={onClose} className="p-2 rounded-lg glass hover:bg-muted/30 transition-colors">
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
           </div>
 
           {/* Headers */}
