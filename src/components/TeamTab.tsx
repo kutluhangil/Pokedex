@@ -7,6 +7,7 @@ import { ALL_TYPES, getDefensiveChart, getOffensiveChart, multiplierColor, multi
 import PokemonPicker from '@/components/PokemonPicker';
 import PokemonDetail from '@/components/PokemonDetail';
 import TeamShare from '@/components/TeamShare';
+import ExportShareButton from '@/components/ExportShareButton';
 import { useFavorites } from '@/hooks/useFavorites';
 
 const TeamTab = () => {
