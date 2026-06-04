@@ -118,7 +118,7 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavig
             <button onClick={onClose} className="p-2 rounded-lg glass hover:bg-muted/30 transition-colors">
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <CryPlayer
                 pokemonId={pokemon.id}
                 isLegendary={isLegendary || isMythical}
@@ -129,6 +129,11 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavig
               <button onClick={onToggleFavorite} className="p-2 rounded-lg glass hover:bg-muted/30 transition-colors">
                 <Heart className={`w-4 h-4 ${isFavorite ? 'fill-poke-red text-poke-red' : 'text-muted-foreground'}`} />
               </button>
+              <ExportShareButton
+                mode={{ kind: 'pokemon', pokemon }}
+                filename={`pokemon-${pokemon.name}`}
+                label="CARD"
+              />
             </div>
           </div>
 
