@@ -7,6 +7,7 @@ import CryPlayer from '@/components/CryPlayer';
 import TypeEffectiveness from '@/components/TypeEffectiveness';
 import EvolutionTree from '@/components/EvolutionTree';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import ExportShareButton from '@/components/ExportShareButton';
 
 interface PokemonDetailProps {
   pokemon: Pokemon;
