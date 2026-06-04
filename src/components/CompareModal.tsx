@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Pokemon, TYPE_COLORS, getArtwork, formatPokemonId, capitalize } from '@/lib/pokemon';
+import ExportShareButton from '@/components/ExportShareButton';
 
 interface Props {
   pokemon: [Pokemon, Pokemon];
