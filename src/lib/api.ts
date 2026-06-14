@@ -1,15 +1,15 @@
 import { Pokemon, PokemonSpecies, EvolutionChain } from './pokemon';
 
 const API_BASE = 'https://pokeapi.co/api/v2';
-const cache = new Map<string, any>();
+const cache = new Map<string, unknown>();
 
 async function fetchCached<T>(url: string): Promise<T> {
-  if (cache.has(url)) return cache.get(url);
+  if (cache.has(url)) return cache.get(url) as T;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   const data = await res.json();
   cache.set(url, data);
-  return data;
+  return data as T;
 }
 
 export async function fetchPokemon(idOrName: number | string): Promise<Pokemon> {

@@ -28,7 +28,9 @@ const TeamShare = ({ team, open, onClose }: Props) => {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
-    } catch {}
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleNativeShare = async () => {
@@ -36,7 +38,9 @@ const TeamShare = ({ team, open, onClose }: Props) => {
     if (navigator.share) {
       try {
         await navigator.share({ title: 'My Pokémon Team', url: shareUrl });
-      } catch {}
+      } catch (e) {
+        console.error(e);
+      }
     } else {
       handleCopy();
     }

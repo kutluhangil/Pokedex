@@ -81,8 +81,11 @@ const PokemonCard = ({
           <motion.img
             src={sprite}
             alt={pokemon.name}
-            className="w-20 h-20 md:w-24 md:h-24 object-contain drop-shadow-md"
-            style={{ imageRendering: 'pixelated' }}
+            className="w-20 h-20 md:w-24 md:h-24 object-contain"
+            style={{ 
+              imageRendering: 'pixelated',
+              filter: `drop-shadow(0 4px 12px hsl(${typeColor} / 0.5))`
+            }}
             whileHover={{ scale: 1.08 }}
             loading="lazy"
           />
@@ -112,7 +115,8 @@ const PokemonCard = ({
         <motion.div
           className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           style={{
-            boxShadow: `inset 0 0 20px hsl(${typeColor} / 0.08), 0 0 20px hsl(${typeColor} / 0.08)`,
+            border: `1px solid hsl(${typeColor} / 0.35)`,
+            boxShadow: `inset 0 0 16px hsl(${typeColor} / 0.15), 0 0 24px hsl(${typeColor} / 0.25)`,
           }}
         />
       </div>

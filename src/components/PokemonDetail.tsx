@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Heart, Sparkles, ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import { Pokemon, PokemonSpecies, TYPE_COLORS, getArtwork, getPixelSprite, formatPokemonId, capitalize } from '@/lib/pokemon';
 import { fetchPokemon, fetchPokemonSpecies } from '@/lib/api';
 import CryPlayer from '@/components/CryPlayer';
@@ -50,6 +50,34 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavig
   const isLegendary = species?.is_legendary || false;
   const isMythical = species?.is_mythical || false;
 
+  const [isPlayingSpeech, setIsPlayingSpeech] = useState(false);
+
+  const toggleSpeech = useCallback(() => {
+    if (isPlayingSpeech) {
+      window.speechSynthesis.cancel();
+      setIsPlayingSpeech(false);
+      return;
+    }
+    if (!description) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(description);
+    utterance.rate = 0.82;
+    utterance.pitch = 0.95;
+    const voices = window.speechSynthesis.getVoices();
+    const englishVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+    if (englishVoice) utterance.voice = englishVoice;
+    utterance.onend = () => setIsPlayingSpeech(false);
+    utterance.onerror = () => setIsPlayingSpeech(false);
+    window.speechSynthesis.speak(utterance);
+    setIsPlayingSpeech(true);
+  }, [description, isPlayingSpeech]);
+
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, [pokemon.id]);
+
   // Navigate to a sibling Pokémon (prev/next by ID)
   const goToOffset = useCallback(async (offset: number) => {
     if (!onNavigate) return;
@@ -58,7 +86,9 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavig
     try {
       const next = await fetchPokemon(target);
       onNavigate(next);
-    } catch {}
+    } catch (e) {
+      console.error(e);
+    }
   }, [pokemon.id, onNavigate]);
 
   // Keyboard shortcuts within the detail modal
@@ -119,6 +149,14 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavig
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
             <div className="flex gap-2 items-center">
+              <button
+                onClick={toggleSpeech}
+                disabled={!description}
+                className={`p-2 rounded-lg glass hover:bg-muted/30 transition-colors disabled:opacity-40`}
+                title={isPlayingSpeech ? "Stop narration" : "Read description"}
+              >
+                {isPlayingSpeech ? <VolumeX className="w-4 h-4 text-poke-red" /> : <Volume2 className="w-4 h-4 text-muted-foreground hover:text-foreground" />}
+              </button>
               <CryPlayer
                 pokemonId={pokemon.id}
                 isLegendary={isLegendary || isMythical}

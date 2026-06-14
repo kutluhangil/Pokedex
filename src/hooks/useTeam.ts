@@ -21,7 +21,9 @@ export function useTeam() {
           );
           setTeam(fetched.slice(0, TEAM_SIZE).concat(Array(TEAM_SIZE).fill(null)).slice(0, TEAM_SIZE));
         }
-      } catch {}
+      } catch (e) {
+        console.error(e);
+      }
       setLoaded(true);
     })();
   }, []);

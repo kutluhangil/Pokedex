@@ -29,7 +29,9 @@ const CollectionTab = () => {
     try {
       const data = await fetchPokemonBatch(ids);
       setPokemon(data);
-    } catch {}
+    } catch (e) {
+      console.error(e);
+    }
     setLoading(false);
   }, [activeGen]);
 
@@ -41,7 +43,9 @@ const CollectionTab = () => {
     try {
       const data = await fetchPokemonBatch([...favorites].slice(0, 30));
       setFavPokemon(data);
-    } catch {}
+    } catch (e) {
+      console.error(e);
+    }
     setLoading(false);
   }, [favorites]);
 

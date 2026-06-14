@@ -94,7 +94,9 @@ const ExploreTab = () => {
     try {
       const p = await fetchPokemon(randomId);
       setSelected(p);
-    } catch {}
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
   const toggleType = useCallback((t: string) => {

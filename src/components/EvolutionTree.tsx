@@ -24,7 +24,17 @@ const idFromSpecies = (url: string): number => {
   return m ? parseInt(m[1], 10) : 0;
 };
 
-const formatTrigger = (details: any[]): string | undefined => {
+interface EvolutionDetail {
+  min_level?: number;
+  item?: { name: string };
+  trigger?: { name: string };
+  min_happiness?: number;
+  time_of_day?: string;
+  known_move?: { name: string };
+  location?: { name: string };
+}
+
+const formatTrigger = (details: EvolutionDetail[]): string | undefined => {
   if (!details || details.length === 0) return undefined;
   const d = details[0];
   if (d.min_level) return `Lv ${d.min_level}`;

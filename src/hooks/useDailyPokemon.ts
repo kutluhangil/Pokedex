@@ -46,7 +46,9 @@ const loadStreak = (): StreakData => {
   try {
     const raw = localStorage.getItem(STREAK_KEY);
     if (raw) return JSON.parse(raw);
-  } catch {}
+  } catch (e) {
+    console.error(e);
+  }
   return { lastDate: '', streak: 0, longest: 0, totalDays: 0, badges: [] };
 };
 
@@ -81,7 +83,7 @@ export function useDailyPokemon() {
     const next = computeNextStreak(streak);
     if (next !== streak) {
       setStreakData(next);
-      try { localStorage.setItem(STREAK_KEY, JSON.stringify(next)); } catch {}
+      try { localStorage.setItem(STREAK_KEY, JSON.stringify(next)); } catch (e) { console.error(e); }
     }
     fetchPokemon(dailyId())
       .then(setPokemon)

@@ -4,7 +4,7 @@ import { Sword, Shield, Play, RotateCcw, Plus } from 'lucide-react';
 import { Pokemon, capitalize, getPixelSprite, TYPE_COLORS, formatPokemonId } from '@/lib/pokemon';
 import { useTeam } from '@/hooks/useTeam';
 import { fetchPokemon } from '@/lib/api';
-import { BattlePokemon, computeAttack, initBattlePokemon } from '@/lib/battle';
+import { BattlePokemon, computeAttack, initBattlePokemon, Move } from '@/lib/battle';
 import PokemonPicker from '@/components/PokemonPicker';
 
 type Phase = 'setup' | 'battle' | 'over';
@@ -119,9 +119,11 @@ const BattleTab = () => {
     if (opponent) setOpponent(initBattlePokemon(opponent.pokemon));
   }, [player, opponent]);
 
-  const playTurn = useCallback(async () => {
+  const playTurn = useCallback(async (playerMove: Move) => {
     if (!player || !opponent || busy || phase !== 'battle') return;
     setBusy(true);
+
+    const opponentMove = opponent.moves[Math.floor(Math.random() * opponent.moves.length)];
 
     // Determine turn order by speed
     const playerSpeed = player.pokemon.stats.find(s => s.stat.name === 'speed')?.base_stat ?? 50;
@@ -132,11 +134,12 @@ const BattleTab = () => {
       attackerKey: 'player' | 'opponent',
       atk: BattlePokemon,
       def: BattlePokemon,
+      move: Move
     ): Promise<BattlePokemon> => {
       const targetKey = attackerKey === 'player' ? 'opponent' : 'player';
       setActiveAttacker(attackerKey);
       await new Promise(r => setTimeout(r, 250));
-      const result = computeAttack(atk, def);
+      const result = computeAttack(atk, def, move);
       setHitTarget(targetKey);
       const newDef: BattlePokemon = { ...def, hp: Math.max(0, def.hp - result.damage) };
       // Apply damage to corresponding state
@@ -144,7 +147,8 @@ const BattleTab = () => {
       else setOpponent(newDef);
       setLogs(l => [
         ...l,
-        `${capitalize(atk.pokemon.name)} attacks for ${result.damage}${result.crit ? ' (CRIT!)' : ''}`,
+        `${capitalize(atk.pokemon.name)} used ${move.name.toUpperCase()}!`,
+        `It dealt ${result.damage} damage${result.crit ? ' (CRIT!)' : ''}.`,
         result.message,
       ]);
       await new Promise(r => setTimeout(r, 600));
@@ -156,16 +160,16 @@ const BattleTab = () => {
     let p = player;
     let o = opponent;
     if (playerFirst) {
-      o = await doAttack('player', p, o);
-      if (o.hp > 0) p = await doAttack('opponent', o, p);
+      o = await doAttack('player', p, o, playerMove);
+      if (o.hp > 0) p = await doAttack('opponent', o, p, opponentMove);
     } else {
-      p = await doAttack('opponent', o, p);
-      if (p.hp > 0) o = await doAttack('player', p, o);
+      p = await doAttack('opponent', o, p, opponentMove);
+      if (p.hp > 0) o = await doAttack('player', p, o, playerMove);
     }
 
     if (p.hp === 0 || o.hp === 0) {
       const winner = p.hp === 0 ? capitalize(o.pokemon.name) : capitalize(p.pokemon.name);
-      setLogs(l => [...l, `${winner} wins the battle!`]);
+      setLogs(l => [...l, `${winner.toUpperCase()} wins the battle!`]);
       setPhase('over');
     }
 
@@ -325,25 +329,50 @@ const BattleTab = () => {
           </div>
 
           {/* Controls */}
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-3">
             {phase === 'battle' && (
+              <div className="grid grid-cols-2 gap-2">
+                {player.moves.map((move) => {
+                  const moveColor = TYPE_COLORS[move.type] || TYPE_COLORS.normal;
+                  return (
+                    <motion.button
+                      key={move.name}
+                      whileTap={{ scale: 0.97 }}
+                      disabled={busy}
+                      onClick={() => playTurn(move)}
+                      className="py-3 px-2 rounded-xl border font-pixel text-[8px] flex flex-col items-center justify-center gap-1 transition-all"
+                      style={{
+                        borderColor: `hsl(${moveColor} / 0.35)`,
+                        background: `hsl(${moveColor} / 0.08)`,
+                        boxShadow: `inset 0 0 8px hsl(${moveColor} / 0.05)`,
+                      }}
+                    >
+                      <span className="text-foreground font-semibold">{move.name.toUpperCase()}</span>
+                      <span
+                        className="text-[6px] px-1.5 py-0.5 rounded-full"
+                        style={{
+                          background: `hsl(${moveColor} / 0.15)`,
+                          color: `hsl(${moveColor})`,
+                        }}
+                      >
+                        {move.type.toUpperCase()} · PWR {move.power}
+                      </span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            )}
+            
+            <div className="flex gap-2">
               <motion.button
                 whileTap={{ scale: 0.97 }}
-                disabled={busy}
-                onClick={playTurn}
-                className="flex-1 py-3 rounded-xl neon-border-red font-pixel text-[9px] text-foreground hover:bg-poke-red/10 transition-colors disabled:opacity-50"
+                onClick={reset}
+                className="flex-1 py-3 rounded-xl glass font-pixel text-[9px] text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5"
               >
-                {busy ? 'FIGHTING…' : '⚔ ATTACK'}
+                <RotateCcw className="w-3 h-3" />
+                {phase === 'over' ? 'REMATCH' : 'RESET'}
               </motion.button>
-            )}
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={reset}
-              className="px-4 py-3 rounded-xl glass font-pixel text-[9px] text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
-            >
-              <RotateCcw className="w-3 h-3" />
-              {phase === 'over' ? 'REMATCH' : 'RESET'}
-            </motion.button>
+            </div>
           </div>
         </div>
       )}

@@ -180,3 +180,26 @@
   from { width: 0%; }
   to { width: var(--stat-width); }
 }
+
+/* CRT Retro Screen Effects */
+.crt-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.45) 100%),
+              repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.12) 1px, transparent 1px, transparent 3px);
+  background-size: 100% 100%, 100% 3px;
+  animation: crt-flicker 0.18s infinite;
+}
+
+.crt-curve {
+  filter: contrast(1.1) saturate(1.15) brightness(1.05);
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes crt-flicker {
+  0% { opacity: 0.975; }
+  50% { opacity: 1; }
+  100% { opacity: 0.98; }
+}

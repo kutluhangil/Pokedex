@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Compass, Search, BookOpen, Home, Globe, Gamepad2, Users, Swords } from 'lucide-react';
+import { Compass, Search, BookOpen, Home, Globe, Gamepad2, Users, Swords, Tv } from 'lucide-react';
 import IntroScreen from '@/components/IntroScreen';
 import Homepage from '@/components/Homepage';
 import ExploreTab from '@/components/ExploreTab';
@@ -41,6 +41,7 @@ const Index = () => {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
   const { setTeamFromIds } = useTeam();
+  const [crtMode, setCrtMode] = useState(() => localStorage.getItem('pokedex-crt') === 'true');
 
   const handleIntroComplete = useCallback(() => {
     setShowIntro(false);
@@ -101,7 +102,30 @@ const Index = () => {
   ]);
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className={`min-h-screen bg-background relative ${crtMode ? 'crt-curve' : ''}`}>
+      {crtMode && <div className="crt-screen" />}
+
+      {/* Floating CRT Toggle */}
+      {!showIntro && (
+        <div className="fixed top-4 right-4 z-50">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              const next = !crtMode;
+              setCrtMode(next);
+              localStorage.setItem('pokedex-crt', String(next));
+            }}
+            className={`p-2.5 rounded-xl glass font-pixel text-[8px] flex items-center gap-1.5 transition-all shadow-lg ${
+              crtMode ? 'text-poke-yellow neon-border-red' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Tv className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">CRT {crtMode ? 'ON' : 'OFF'}</span>
+          </motion.button>
+        </div>
+      )}
+
       <AnimatePresence>
         {showIntro && <IntroScreen onComplete={handleIntroComplete} />}
       </AnimatePresence>

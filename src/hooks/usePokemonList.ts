@@ -28,6 +28,7 @@ export function usePokemonList(limit = 20) {
 
   useEffect(() => {
     if (pokemon.length === 0) loadMore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { pokemon, loading, loadMore, hasMore };
