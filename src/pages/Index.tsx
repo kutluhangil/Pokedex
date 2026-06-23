@@ -48,8 +48,8 @@ const Index = () => {
     localStorage.setItem(INTRO_KEY, 'true');
   }, []);
 
-  const handleHomepageNavigate = useCallback((tab: 'explore' | 'pokedes' | 'world') => {
-    setActiveTab(tab as TabId);
+  const handleHomepageNavigate = useCallback((tab: TabId) => {
+    setActiveTab(tab);
     setShowHomepage(false);
   }, []);
 
