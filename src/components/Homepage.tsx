@@ -113,107 +113,7 @@ const GlossyPokeball = () => {
   );
 };
 
-/* ─── Walking Sprite (Easter Egg) ─── */
-const WalkingSprite = ({ onOpen }: { onOpen?: (id: number) => void }) => {
-  const [jumping, setJumping] = useState(false);
-  const [sparkles, setSparkles] = useState<{ id: number; x: number; y: number; color: string }[]>([]);
 
-  // Pick a random popular Pokémon
-  const pokemon = useMemo(() => {
-    const list = [
-      { id: 25, name: 'pikachu' },
-      { id: 133, name: 'eevee' },
-      { id: 39, name: 'jigglypuff' },
-      { id: 143, name: 'snorlax' },
-      { id: 94, name: 'gengar' },
-      { id: 151, name: 'mew' },
-    ];
-    return list[Math.floor(Math.random() * list.length)];
-  }, []);
-
-  const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-  const cryUrl = `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${pokemon.id}.ogg`;
-
-  const handleClick = useCallback(() => {
-    if (jumping) return;
-    const audio = new Audio(cryUrl);
-    audio.volume = 0.3;
-    audio.play().catch(() => {});
-
-    // Generate click sparkles
-    const colors = ['#facc15', '#ef4444', '#3b82f6', '#10b981', '#ffffff'];
-    const newSparkles = Array.from({ length: 12 }, (_, i) => ({
-      id: Date.now() + i,
-      x: (Math.random() - 0.5) * 100,
-      y: (Math.random() - 0.5) * 100 - 20,
-      color: colors[Math.floor(Math.random() * colors.length)],
-    }));
-
-    setSparkles(newSparkles);
-    setJumping(true);
-    setTimeout(() => setJumping(false), 700);
-    setTimeout(() => setSparkles([]), 900);
-    if (onOpen) setTimeout(() => onOpen(pokemon.id), 550);
-  }, [jumping, pokemon.id, cryUrl, onOpen]);
-
-  return (
-    <motion.div
-      className="absolute bottom-4 z-20"
-      initial={{ x: '-15vw' }}
-      animate={{ x: ['-15vw', '115vw'] }}
-      transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-      style={{ left: 0 }}
-    >
-      <div className="relative">
-        {sparkles.map((s) => (
-          <motion.div
-            key={s.id}
-            className="absolute top-1/2 left-1/2 pointer-events-none rounded-full"
-            initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
-            animate={{ x: s.x, y: s.y, opacity: 0, scale: [0, 1.2, 0.8] }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            style={{
-              width: 5,
-              height: 5,
-              background: s.color,
-              boxShadow: `0 0 8px ${s.color}`,
-            }}
-          />
-        ))}
-
-        <motion.button
-          onClick={handleClick}
-          aria-label={`${pokemon.name} click`}
-          className="block cursor-pointer bg-transparent border-0 p-1 -m-1"
-          animate={jumping ? { y: [0, -24, 0, -10, 0], rotate: [0, -10, 0, 8, 0] } : { y: [0, -2, 0] }}
-          transition={jumping
-            ? { duration: 0.7, ease: 'easeOut' }
-            : { duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
-          whileHover={{ scale: 1.15 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <img
-            src={spriteUrl}
-            alt={pokemon.name}
-            width={64}
-            height={64}
-            style={{ imageRendering: 'pixelated' }}
-            draggable={false}
-          />
-        </motion.button>
-        <motion.div
-          animate={jumping
-            ? { scaleX: [1, 1.3, 1, 1.15, 1], opacity: [0.3, 0.08, 0.3, 0.15, 0.3] }
-            : { scaleX: [1, 0.9, 1], opacity: [0.3, 0.22, 0.3] }}
-          transition={jumping
-            ? { duration: 0.7, ease: 'easeOut' }
-            : { duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="mx-auto mt-0.5 h-1 w-10 rounded-full bg-foreground/20 blur-[2px]"
-        />
-      </div>
-    </motion.div>
-  );
-};
 
 /* ─── Starfield Background ─── */
 const Stars = () => {
@@ -756,10 +656,7 @@ const Homepage = ({ onNavigate, onPokemonClick }: HomepageProps) => {
         </div>
       </section>
 
-      {/* ─── EASTER EGG RETRO SPRITE ZONE ─── */}
-      <section className="relative w-full h-16 bg-slate-950/40 border-t border-b border-white/5 overflow-hidden my-6">
-        <WalkingSprite onOpen={onPokemonClick} />
-      </section>
+
 
       {/* ─── FOOTER STATISTICS SUMMARY ─── */}
       <footer className="max-w-4xl mx-auto px-6 pt-16 pb-20 text-center relative z-10 border-t border-white/5">

@@ -233,11 +233,11 @@ const ExploreTab = () => {
           <h2 className="font-pixel text-[10px] text-muted-foreground mb-3">FEATURED</h2>
           <div
             ref={scrollRef}
-            className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide"
+            className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide"
             style={{ scrollbarWidth: 'none' }}
           >
             {pokemon.slice(0, 10).map((p, i) => (
-              <div key={p.id} className="flex-shrink-0">
+              <div key={p.id} className="flex-shrink-0 w-36 sm:w-44">
                 <PokemonCard
                   pokemon={p}
                   onClick={() => setSelected(p)}
@@ -258,7 +258,7 @@ const ExploreTab = () => {
         <h2 className="font-pixel text-[10px] text-muted-foreground mb-3">
           {filterCount > 0 ? `${filtered.length} RESULTS` : 'ALL POKÉMON'}
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
           {filtered.map((p, i) => (
             <PokemonCard
               key={p.id}

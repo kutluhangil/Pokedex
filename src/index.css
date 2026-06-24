@@ -65,6 +65,8 @@
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation;
   }
 }
 

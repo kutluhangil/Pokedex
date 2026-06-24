@@ -6,6 +6,7 @@ import { fetchPokemon, fetchPokemonSpecies } from '@/lib/api';
 import CryPlayer from '@/components/CryPlayer';
 import TypeEffectiveness from '@/components/TypeEffectiveness';
 import EvolutionTree from '@/components/EvolutionTree';
+import VoiceVisualizer from '@/components/VoiceVisualizer';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import ExportShareButton from '@/components/ExportShareButton';
 
@@ -251,9 +252,30 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavig
             </div>
 
             {description && activeSection === 'stats' && (
-              <p className="text-sm text-muted-foreground text-center mb-8 leading-relaxed max-w-md mx-auto">
-                {description}
-              </p>
+              <div className="flex flex-col items-center mb-8">
+                <AnimatePresence>
+                  {isPlayingSpeech && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 24, opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden mb-3"
+                    >
+                      <VoiceVisualizer active={isPlayingSpeech} color={`hsl(${typeColor})`} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <p 
+                  className={`text-sm text-center leading-relaxed max-w-md mx-auto transition-all duration-300 ${
+                    isPlayingSpeech 
+                      ? 'font-medium scale-[1.02]' 
+                      : 'text-muted-foreground'
+                  }`}
+                  style={isPlayingSpeech ? { color: `hsl(${typeColor})`, textShadow: `0 0 12px hsl(${typeColor} / 0.5)` } : {}}
+                >
+                  {description}
+                </p>
+              </div>
             )}
 
             {/* Stats section */}
@@ -353,14 +375,30 @@ const PokemonDetail = ({ pokemon, onClose, isFavorite, onToggleFavorite, onNavig
 
                 {/* Pokédex Entries */}
                 {species && (
-                  <div className="glass rounded-xl p-4">
+                  <div className="glass rounded-xl p-4 relative overflow-hidden">
+                    <AnimatePresence>
+                      {isPlayingSpeech && (
+                        <motion.div 
+                          className="absolute top-3 right-4 z-10"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                        >
+                          <VoiceVisualizer active={isPlayingSpeech} color={`hsl(${typeColor})`} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                     <h3 className="font-pixel text-[8px] text-muted-foreground mb-3 tracking-wider">POKÉDEX ENTRIES</h3>
-                    <div className="space-y-3 max-h-48 overflow-y-auto pr-2" style={{ maskImage: 'linear-gradient(to bottom, black 85%, transparent)' }}>
+                    <div className="space-y-3 max-h-48 overflow-y-auto pr-2 relative z-0" style={{ maskImage: 'linear-gradient(to bottom, black 85%, transparent)' }}>
                       {species.flavor_text_entries
                         .filter(e => e.language.name === 'en')
                         .slice(0, 5)
                         .map((entry, i) => (
-                          <p key={i} className="text-xs text-muted-foreground leading-relaxed">
+                          <p key={i} className={`text-xs leading-relaxed transition-all duration-300 ${
+                            isPlayingSpeech && i === 0 ? 'font-medium scale-[1.01]' : 'text-muted-foreground'
+                          }`}
+                          style={isPlayingSpeech && i === 0 ? { color: `hsl(${typeColor})`, textShadow: `0 0 8px hsl(${typeColor} / 0.4)` } : {}}
+                          >
                             {entry.flavor_text.replace(/\f/g, ' ').replace(/\n/g, ' ')}
                           </p>
                         ))}

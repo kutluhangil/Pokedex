@@ -10,6 +10,7 @@ interface PokemonCardProps {
   index?: number;
   isInCompare?: boolean;
   onToggleCompare?: () => void;
+  forceShiny?: boolean;
 }
 
 const PokemonCard = ({
@@ -20,10 +21,11 @@ const PokemonCard = ({
   index = 0,
   isInCompare = false,
   onToggleCompare,
+  forceShiny = false,
 }: PokemonCardProps) => {
   const mainType = pokemon.types[0]?.type.name || 'normal';
   const typeColor = TYPE_COLORS[mainType] || TYPE_COLORS.normal;
-  const sprite = getPixelSprite(pokemon);
+  const sprite = forceShiny ? (pokemon.sprites.front_shiny || getPixelSprite(pokemon)) : getPixelSprite(pokemon);
 
   return (
     <motion.div
@@ -36,9 +38,9 @@ const PokemonCard = ({
       className="relative cursor-pointer group"
     >
       <div
-        className="relative w-44 h-60 md:w-52 md:h-68 rounded-2xl overflow-hidden glass"
+        className={`relative w-full h-full flex flex-col rounded-2xl overflow-hidden glass ${forceShiny ? 'border-2 border-poke-yellow shadow-[0_0_20px_rgba(250,204,21,0.2)]' : ''}`}
         style={{
-          boxShadow: `0 0 12px hsl(${typeColor} / 0.1), 0 4px 20px hsl(0 0% 0% / 0.3)`,
+          boxShadow: forceShiny ? undefined : `0 0 12px hsl(${typeColor} / 0.1), 0 4px 20px hsl(0 0% 0% / 0.3)`,
         }}
       >
         <div
@@ -77,11 +79,11 @@ const PokemonCard = ({
           {formatPokemonId(pokemon.id)}
         </span>
 
-        <div className="flex items-center justify-center pt-8 pb-2 h-40 md:h-44">
+        <div className="flex-1 flex items-center justify-center pt-8 pb-2 min-h-[120px] md:min-h-[140px]">
           <motion.img
             src={sprite}
             alt={pokemon.name}
-            className="w-20 h-20 md:w-24 md:h-24 object-contain"
+            className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain"
             style={{ 
               imageRendering: 'pixelated',
               filter: `drop-shadow(0 4px 12px hsl(${typeColor} / 0.5))`
@@ -91,7 +93,7 @@ const PokemonCard = ({
           />
         </div>
 
-        <div className="px-4 pb-4">
+        <div className="px-3 md:px-4 pb-3 md:pb-4 mt-auto">
           <h3 className="font-pixel text-[9px] md:text-[10px] text-foreground mb-2 truncate">
             {capitalize(pokemon.name)}
           </h3>
@@ -99,7 +101,7 @@ const PokemonCard = ({
             {pokemon.types.map(t => (
               <span
                 key={t.type.name}
-                className="px-2 py-0.5 rounded-full text-[8px] font-medium"
+                className="px-1.5 sm:px-2 py-0.5 rounded-full text-[7px] sm:text-[8px] font-medium truncate"
                 style={{
                   background: `hsl(${TYPE_COLORS[t.type.name] || TYPE_COLORS.normal} / 0.15)`,
                   color: `hsl(${TYPE_COLORS[t.type.name] || TYPE_COLORS.normal})`,

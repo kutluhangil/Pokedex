@@ -179,9 +179,9 @@ const Index = () => {
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowHomepage(true)}
-                className="flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+                className="flex flex-col items-center justify-center min-w-[48px] min-h-[48px] gap-1 px-1 py-1 rounded-xl transition-all text-muted-foreground hover:text-foreground active:opacity-70"
               >
-                <Home className="w-4 h-4" />
+                <Home className="w-5 h-5 sm:w-4 sm:h-4" />
                 <span className="font-pixel text-[6px]">Home</span>
               </motion.button>
 
@@ -193,18 +193,18 @@ const Index = () => {
                     key={tab.id}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`relative flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-xl transition-colors ${
-                      isActive ? 'text-poke-red' : 'text-muted-foreground hover:text-foreground'
+                    className={`relative flex flex-col items-center justify-center min-w-[48px] min-h-[48px] gap-1 px-1 py-1 rounded-xl transition-all active:scale-95 ${
+                      isActive ? 'text-poke-red' : 'text-muted-foreground hover:text-foreground active:opacity-70'
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-5 h-5 sm:w-4 sm:h-4" />
                     <span className="font-pixel text-[6px]">
                       {tab.label}
                     </span>
                     {isActive && (
                       <motion.div
                         layoutId="tab-indicator"
-                        className="absolute -bottom-0 w-6 h-0.5 rounded-full bg-poke-red"
+                        className="absolute -bottom-1 w-8 h-0.5 rounded-full bg-poke-red"
                         style={{ boxShadow: '0 0 6px hsl(var(--poke-red) / 0.3)' }}
                       />
                     )}

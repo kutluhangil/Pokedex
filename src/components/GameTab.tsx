@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Trophy, Flame, RefreshCw } from 'lucide-react';
 import { Pokemon, capitalize, getArtwork } from '@/lib/pokemon';
 import { fetchPokemon } from '@/lib/api';
+import ShinyHunter from '@/components/ShinyHunter';
 
 const STREAK_KEY = 'pokedex-game-best-streak';
 const POOL_SIZE = 1025;
@@ -25,6 +26,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 const GameTab = () => {
+  const [gameMode, setGameMode] = useState<'whosthat' | 'shinyhunter'>('whosthat');
   const [target, setTarget] = useState<Pokemon | null>(null);
   const [options, setOptions] = useState<Pokemon[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,8 +100,28 @@ const GameTab = () => {
 
   return (
     <div className="min-h-full pb-32 pt-6 px-6 relative overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      {/* Game Mode Selector */}
+      <div className="flex gap-2 mb-6">
+        <button 
+          onClick={() => setGameMode('whosthat')}
+          className={`flex-1 py-2 rounded-xl font-pixel text-[9px] transition-all ${gameMode === 'whosthat' ? 'bg-poke-yellow text-black shadow-[0_0_15px_rgba(250,204,21,0.4)]' : 'glass text-muted-foreground hover:bg-muted/30'}`}
+        >
+          WHO'S THAT?
+        </button>
+        <button 
+          onClick={() => setGameMode('shinyhunter')}
+          className={`flex-1 py-2 rounded-xl font-pixel text-[9px] transition-all ${gameMode === 'shinyhunter' ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)] neon-border-green' : 'glass text-muted-foreground hover:bg-muted/30'}`}
+        >
+          SHINY SAFARI
+        </button>
+      </div>
+
+      {gameMode === 'shinyhunter' ? (
+        <ShinyHunter />
+      ) : (
+        <>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-pixel text-lg md:text-xl text-poke-yellow text-glow-yellow">WHO'S THAT?</h1>
           <p className="text-xs text-muted-foreground mt-1">Guess the Pokémon</p>
@@ -217,6 +239,8 @@ const GameTab = () => {
           );
         })}
       </div>
+      </>
+      )}
     </div>
   );
 };
